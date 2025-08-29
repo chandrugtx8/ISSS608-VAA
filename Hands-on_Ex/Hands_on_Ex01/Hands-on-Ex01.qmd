@@ -1,0 +1,162 @@
+---
+title: "Hands on Exercise 1"
+author: "Chandru"
+---
+
+# **Getting Started**
+
+**Install and launching of R packages**
+
+The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer.If they are, then they will be launched into R.
+
+```{r}
+
+pacman::p_load(sf, tidyverse)
+```
+
+**Importing Geospatial Data**
+
+Importing polygon feature data in shapefile format
+
+The code chunk below uses st_read() function of sf package to import MP14_SUBZONE_WEB_PL shapefile into R as a polygon feature data frame.
+
+```{r}
+# Option 1: dsn = folder + layer
+mpsz <- sf::st_read(
+  dsn   = "Data/geospatial",
+  layer = "MP14_SUBZONE_WEB_PL"
+)
+
+```
+
+Importing polyline feature data in shapefile form
+
+The code chunk below uses st_read() function of sf package to import CyclingPath shapefile into R as line feature data frame.
+
+```{r}
+cyclingpath <- sf::st_read(
+  dsn   = "Data/geospatial",
+  layer = "CyclingPathGazette"
+)
+```
+
+Importing GIS data in kml format
+
+The PreSchoolsLocation is in kml format. The code chunk below will be used to import the kml into R.
+
+```{r}
+preschool <- sf::st_read("Data/geospatial/PreSchoolsLocation.kml")
+```
+
+**Checking the Content of A Simple Feature Data Frame**
+
+Working with st_geometry()
+
+```{r}
+st_geometry(mpsz)
+```
+
+Working with glimpse()
+
+```{r}
+glimpse(mpsz)
+```
+
+Working with head()
+
+```{r}
+head(mpsz, n=5)  
+```
+
+**Plotting the Geospatial Data**
+
+In geospatial data science, by looking at the feature information is not enough. We are also interested to visualise the geospatial features. This is the time you will find plot() of R Graphic comes in very handy as shown in the code chunk below
+
+```{r}
+plot(mpsz)
+```
+
+The default plot of an sf object is a multi-plot of all attributes, up to a reasonable maximum as shown above. We can, however, choose to plot only the geometry by using the code chunk below.
+
+```{r}
+plot(st_geometry(mpsz))
+```
+
+Alternatively, we can also choose the plot the sf object by using a specific attribute as shown in the code chunk below.
+
+```{r}
+plot(mpsz["PLN_AREA_N"])
+```
+
+Now, let us plot the preschool layer ontop of the mpsz layer by using the code chunk below.
+
+```{r}
+plot(st_geometry(mpsz))
+plot(st_geometry(preschool), 
+     add = TRUE)
+```
+
+Working with Projection
+
+Assigning EPSG code to a simple feature data frame
+
+One of the common issue that can happen during importing geospatial data into R is that the coordinate system of the source data was either missing (such as due to missing .proj for ESRI shapefile) or wrongly assigned during the importing process.
+
+This is an example the coordinate system of mpsz simple feature data frame by using st_crs() of sf package as shown in the code chunk below.
+
+```{r}
+st_crs(mpsz)
+```
+
+Although mpsz data frame is projected in svy21 but when we read until the end of the print, it indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for svy21 should be 3414.
+
+In order to assign the correct EPSG code to mpsz data frame, st_set_crs() of sf package is used as shown in the code chunk below.
+
+```{r}
+mpsz <- st_set_crs(mpsz, 3414)
+```
+Now, let us check the CSR again by using the code chunk below.
+```{r}
+st_crs(mpsz)
+```
+
+Notice that the EPSG code is 3414 now.
+
+Transforming the projection of preschool from wgs84 to svy21.
+
+In geospatial analytics, it is very common for us to transform the original data from geographic coordinate system to projected coordinate system. This is because geographic coordinate system is not appropriate if the analysis need to use distance or/and area measurements.
+
+This is a scenario that st_set_crs() is not appropriate and st_transform() of sf package should be used. This is because we need to reproject preschool from one coordinate system to another coordinate system mathemetically.
+
+Let us perform the projection transformation by using the code chunk below.
+
+```{r}
+preschool <- st_transform(preschool, 
+                              crs = 3414)
+```
+Notice that it is in svy21 projected coordinate system now. Furthermore, if you refer to Bounding box:, the values are greater than 0-360 range of decimal degree commonly used by most of the geographic coordinate systems.
+
+Now, let us try to plot the preschool layer ontop of mpsz layer again by using the similar code chunk you used earlier.
+
+```{r}
+plot(st_geometry(mpsz))
+plot(st_geometry(preschool), add = TRUE)
+```
+
+Notice that the composite map display like what we want now.
+
+Importing and Converting An Aspatial Data
+
+Since listings data set is in csv file format, we will use read_csv() of readr package to import listing.csv as shown the code chunk below. The output R object is called listings and it is a tibble data frame.
+
+```{r}
+listings <- readr::read_csv("Data/aspatial/listings.csv")
+```
+
+After importing the data file into R, it is important for us to examine if the data file has been imported correctly.
+
+The code chunk below shows list() of Base R instead of glimpse() is used to do the job.
+```{r}
+list(listings) 
+```
+
