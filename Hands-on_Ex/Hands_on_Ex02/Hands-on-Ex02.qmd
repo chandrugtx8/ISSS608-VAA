@@ -121,63 +121,9 @@ popdata2024 <- popdata2024 %>%
   filter(`ECONOMY ACTIVE` > 0)
 ```
 
-Next, left_join() of dplyr is used to join the geographical data and attribute table using planning subzone name e.g. SUBZONE_N and SZ as the common identifier.
-
+Importing and Wrangling Geospatial Data Sets
 ```{r}
-mpsz_pop2024 <- left_join(mpsz, popdata2024,
-                          by = c("SUBZONE_N" = "SZ"))
+mpsz_sf <- sf::st_read("../Hands_on_Ex02/Data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
+  sf::st_zm(drop = TRUE, what = "ZM") |>
+  sf::st_transform(crs = 3414)
 ```
-
-Thing to learn from the code chunk above:
-
-left_join() of dplyr package is used with mpsz simple feature data frame as the left data table is to ensure that the output will be a simple features data frame.
-
-```{r}
-write_rds(mpsz_pop2024, "Data/rds/mpsz_pop2024.rds")
-```
-
-Choropleth Mapping Geospatial Data Using tmap
-
-Choropleth mapping involves the symbolisation of enumeration units, such as countries, provinces, states, counties or census units, using area patterns or graduated colors. For example, a social scientist may need to use a choropleth map to portray the spatial distribution of aged population of Singapore by Master Plan 2014 Subzone Boundary.
-
-Two approaches can be used to prepare thematic map using tmap, they are:
-
-Plotting a thematic map quickly by using qtm().
-Plotting highly customisable thematic map by using tmap elements.
-
-
-Plotting a choropleth map quickly by using qtm()
-
-The easiest and quickest to draw a choropleth map using tmap is using qtm(). It is concise and provides a good default visualisation in many cases.
-
-The code chunk below will draw a cartographic standard choropleth map as shown below.
-
-```{r}
-tmap_mode("plot")
-qtm(shp = mpsz_pop2024, 
-    fill = "DEPENDENCY")
-```
-
-Creating a choropleth map by using tmap’s elements
-
-Despite its usefulness of drawing a choropleth map quickly and easily, the disadvantge of qtm() is that it makes aesthetics of individual layers harder to control. To draw a high quality cartographic choropleth map as shown in the figure below, tmap’s drawing elements should be used.
-
-```{r}
-tm_shape(mpsz_pop2024) +
-  tm_polygons(fill = "DEPENDENCY",
-              fill.scale = tm_scale_intervals(
-                style = "quantile", 
-                n = 5,
-                values = "brewer.blues"),
-              fill.legend = tm_legend(
-                title = "Dependency ratio")) +
-  tm_title("Distribution of Dependency Ratio by planning subzone") +
-  tm_layout(frame = TRUE) +
-  tm_borders(fill_alpha = 0.5) +
-  tm_compass(type="8star", size = 2) +
-  tm_scalebar() +
-  tm_grid(alpha =0.2) +
-  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
-             position = c("left", "bottom"))
-```
-

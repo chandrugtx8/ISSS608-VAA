@@ -1,0 +1,40 @@
+---
+title: "Hands-on -Exercise 4"
+author: "Chandru"
+---
+Spatial Point Pattern Analysis (SPPA) is the evaluation of the pattern or distribution of a set of points on a surface. The points may represent:
+
+events such as crimes, traffic accidents, or disease onsets, or
+business services (e.g., coffee shops and fast-food outlets) or facilities such as childcare centres and eldercare centres.
+First-order Spatial Point Pattern Analysis (1st-SPPA) focuses on understanding the intensity or density of points across a study area. It examines how the distribution of points varies over space, essentially identifying trends or patterns in point density. This type of analysis deals with the individual locations of points and their distribution, without considering interactions between them.
+
+In essence, 1st-SPPA helps answer questions such as:
+
+Where are points most densely located within the study area?
+Is point density uniform, or does it vary across space?
+How spread out is the point pattern?
+In this chapter, you will gain hands-on experience with spatstat to perform two commonly used 1st-SPPA methods:
+
+The specific questions we would like to answer are as follows:
+
+Are the childcare centres in Singapore randomly distributed throughout the country?
+If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
+
+
+
+Installing and Loading the R packages
+
+
+```{r}
+pacman::p_load(sf, terra, spatstat, 
+               tmap, rvest, tidyverse)
+```
+
+Importing and Wrangling Geospatial Data Sets
+
+```{r}
+mpsz_sf <- sf::st_read("../Hands_on_Ex02/Data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
+  sf::st_zm(drop = TRUE, what = "ZM") |>
+  sf::st_transform(crs = 3414)
+```
+
