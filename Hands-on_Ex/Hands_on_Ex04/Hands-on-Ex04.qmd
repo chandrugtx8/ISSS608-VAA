@@ -2,39 +2,337 @@
 title: "Hands-on -Exercise 4"
 author: "Chandru"
 ---
+
 Spatial Point Pattern Analysis (SPPA) is the evaluation of the pattern or distribution of a set of points on a surface. The points may represent:
 
-events such as crimes, traffic accidents, or disease onsets, or
-business services (e.g., coffee shops and fast-food outlets) or facilities such as childcare centres and eldercare centres.
-First-order Spatial Point Pattern Analysis (1st-SPPA) focuses on understanding the intensity or density of points across a study area. It examines how the distribution of points varies over space, essentially identifying trends or patterns in point density. This type of analysis deals with the individual locations of points and their distribution, without considering interactions between them.
+events such as crimes, traffic accidents, or disease onsets, or business services (e.g., coffee shops and fast-food outlets) or facilities such as childcare centres and eldercare centres. First-order Spatial Point Pattern Analysis (1st-SPPA) focuses on understanding the intensity or density of points across a study area. It examines how the distribution of points varies over space, essentially identifying trends or patterns in point density. This type of analysis deals with the individual locations of points and their distribution, without considering interactions between them.
 
 In essence, 1st-SPPA helps answer questions such as:
 
-Where are points most densely located within the study area?
-Is point density uniform, or does it vary across space?
-How spread out is the point pattern?
-In this chapter, you will gain hands-on experience with spatstat to perform two commonly used 1st-SPPA methods:
+Where are points most densely located within the study area? Is point density uniform, or does it vary across space? How spread out is the point pattern? In this chapter, you will gain hands-on experience with spatstat to perform two commonly used 1st-SPPA methods:
 
 The specific questions we would like to answer are as follows:
 
-Are the childcare centres in Singapore randomly distributed throughout the country?
-If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
-
-
+Are the childcare centres in Singapore randomly distributed throughout the country? If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
 
 Installing and Loading the R packages
-
 
 ```{r}
 pacman::p_load(sf, terra, spatstat, 
                tmap, rvest, tidyverse)
 ```
 
-Importing and Wrangling Geospatial Data Sets
+## Importing and Wrangling Geospatial Data Sets
 
 ```{r}
 mpsz_sf <- sf::st_read("../Hands_on_Ex02/Data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
   sf::st_zm(drop = TRUE, what = "ZM") |>
   sf::st_transform(crs = 3414)
+```
+
+Next, build a function called extract_kml_field for extracting REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field by using the code chunk below.
+
+```{r}
+extract_kml_field <- function(html_text, field_name) {
+  if (is.na(html_text) || html_text == "") return(NA_character_)
+  
+  page <- read_html(html_text)
+  rows <- page %>% html_elements("tr")
+  
+  value <- rows %>%
+    keep(~ html_text2(html_element(.x, "th")) == field_name) %>%
+    html_element("td") %>%
+    html_text2()
+  
+  if (length(value) == 0) NA_character_ else value
+}
+```
+
+```{r}
+mpsz_sf <- mpsz_sf %>%
+  mutate(
+    REGION_N = map_chr(Description, extract_kml_field, "REGION_N"),
+    PLN_AREA_N = map_chr(Description, extract_kml_field, "PLN_AREA_N"),
+    SUBZONE_N = map_chr(Description, extract_kml_field, "SUBZONE_N"),
+    SUBZONE_C = map_chr(Description, extract_kml_field, "SUBZONE_C")
+  ) %>%
+  select(-Name, -Description) %>%
+  relocate(geometry, .after = last_col())
+```
+
+```{r}
+mpsz_cl <- mpsz_sf %>%
+  filter(SUBZONE_N != "SOUTHERN GROUP",
+         PLN_AREA_N != "WESTERN ISLANDS",
+         PLN_AREA_N != "NORTH-EASTERN ISLANDS")
+```
+
+```{r}
+write_rds(mpsz_cl, 
+          "Data/mpsz_cl.rds")
+```
+
+Next, code chunk below will be used to import the childcare Service data downloaded from data.gov.sg into R environment as sf data frame called chilcare_sf. The Simple Feature Geometry (sfg) of this geospatial data layer if
+
+```{r}
+childcare_sf <- st_read("Data/ChildCareServices.kml") %>% 
+  st_zm(drop = TRUE, what = "ZM") %>%
+  st_transform(crs = 3414)
+```
+
+## Mapping the geospatial data sets
+
+After checking the referencing system of each geospatial data data frame, it is also useful for us to plot a map to show their spatial patterns.
+
+```{r}
+tmap_mode('view')
+tm_shape(childcare_sf)+
+  tm_dots()
+```
+
+```{r}
+tmap_mode('plot')
+```
+
+Geospatial Data wrangling
+
+Converting sf data frames to ppp class
+
+spatstat requires the point event data in ppp object form. The code chunk below uses [as.ppp()] of spatstat package to convert childcare_sf to ppp format.
+
+```{r}
+childcare_ppp <- as.ppp(childcare_sf)
+```
+
+Next, class() of Base R will be used to verify the object class of childcare_ppp.
+```{r}
+class(childcare_ppp)
+```
+
+You can take a quick look at the summary statistics of the newly converted ppp object by using the code chunk below.
+
+```{r}
+summary(childcare_ppp)
+```
+
+Creating owin object
+
+When analysing spatial point patterns, it is a good practice to confine the analysis with a geographical area like Singapore boundary. In spatstat, an object called owin is specially designed to represent this polygonal region.
+
+The code chunk below, as.owin() of spatstat is used to covert mpsz_sf into owin object of spatstat.
+
+```{r}
+sg_owin <- as.owin(mpsz_cl)
+```
+
+Again, class() will be used to verify the object class of sg_owin.
+
+```{r}
+class(sg_owin)
+```
+
+The result above confirmed that sg_owin is indeed in owin object.
+
+sg_owin object can be displayed by using plot() function.
+
+```{r}
+plot(sg_owin)
+```
+
+Combining point events object and owin object
+
+In this last step of geospatial data wrangling, we will extract childcare events that are located within Singapore by using the code chunk below.
+
+```{r}
+childcareSG_ppp = childcare_ppp[sg_owin]
+```
+
+
+Nearest Neighbor Analysis (NNA) is a spatial statistics method that calculates the average distance between each point and its closest neighbor to determine if a pattern of points is clustered, dispersed, or randomly distributed.
+
+Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose
+
+Perform the Clark-Evans test without CSR
+
+clarkevans.test() of spatstat.explore package support two Clark-Evans test, namely: without CRS and with CRS. In the code chunk below, Clark-Evans test without CSR method is used.
+
+```{r}
+clarkevans.test(childcareSG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"))
+```
+
+Perform the Clark-Evans test with CSR
+ 
+In the code chunk below, the argument method = “MonteCarlo” is used. In this case, the p-value for the test is computed by comparing the observed value of R to the results obtained from nsim (i.e. 39, 99, 999) simulated realisations of Complete Spatial Randomness conditional on the observed number of points.
+```{r}
+clarkevans.test(childcareSG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"),
+                method="MonteCarlo",
+                nsim=99)
+```
+
+Kernel Density Estimation Method
+
+Kernel Density Estimation (KDE) is a valuable tool for visualising and analyzing first-order spatial point patterns. It is widely considered a method within Exploratory Spatial Data Analysis (ESDA) because it’s used to visualize and understand spatial data patterns by transforms discrete point data (like locations of childcare service, crime incidents or disease cases) into continuous density surfaces that reveal clusters and variations in event occurrences, without making prior assumptions about data distribution. It helps to begin understanding data distribution, identify hotspots, and explore relationships between spatial variables before performing more rigorous analysis.
+
+Working with automatic bandwidth selection method
+The code chunk below computes a kernel density by using the following configurations of density() of spatstat:
+
+bw.diggle() automatic bandwidth selection method. Other recommended methods are bw.CvL(), bw.scott() or bw.ppl().
+The smoothing kernel used is gaussian, which is the default. Other smoothing methods are: “epanechnikov”, “quartic” or “disc”.
+The intensity estimate is corrected for edge effect bias by using method described by Jones (1993) and Diggle (2010, equation 18.9). The default is FALSE.
+
+
+
+```{r}
+kde_SG_diggle <- density(
+  childcareSG_ppp,
+  sigma=bw.diggle,
+  edge=TRUE,
+  kernel="gaussian") 
+```
+
+The plot() function of Base R is then used to display the kernel density derived.
+
+```{r}
+plot(kde_SG_diggle)
+```
+
+In the code chunk below, summary() of Base R is used to print the summary report of the
+
+```{r}
+summary(kde_SG_diggle)
+```
+
+Before we move on to next section, it is good to know that you can retrieve the bandwidth used to compute the kde layer by using the code chunk below.
+
+```{r}
+bw <- bw.diggle(childcareSG_ppp)
+bw
+```
+
+
+Rescalling KDE values
+
+
+
+In the code chunk below, rescale.ppp() is used to covert the unit of measurement from meter to kilometer.
+
+```{r}
+childcareSG_ppp_km <- rescale.ppp(
+  childcareSG_ppp, 1000, "km")
+```
+
+Now, we can re-run density() using the resale data set and plot the output kde map.
+
+```{r}
+kde_childcareSG_km <- density(childcareSG_ppp_km,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                              kernel="gaussian")
+```
+
+Next, plot() is used to plot the kde object as shown below.
+
+```{r}
+plot(kde_childcareSG_km)
+```
+
+Working with different automatic badwidth methods
+
+Beside bw.diggle(), there are three other spatstat functions can be used to determine the bandwidth, they are: bw.CvL(), bw.scott(), and bw.ppl().
+
+Let us take a look at the bandwidth return by these automatic bandwidth calculation methods by using the code chunk below.
+
+```{r}
+bw.CvL(childcareSG_ppp_km)
+```
+
+```{r}
+bw.scott(childcareSG_ppp_km)
+```
+
+```{r}
+bw.ppl(childcareSG_ppp_km)
+```
+
+```{r}
+bw.diggle(childcareSG_ppp_km)
+```
+
+Baddeley et. (2016) suggested the use of the bw.ppl() algorithm because past experience shown that it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. But they also insist that if the purpose of once study is to detect a single tight cluster in the midst of random noise then the bw.diggle() method seems to work best.
+
+The code chunk beow will be used to compare the output of using bw.diggle and bw.ppl methods.
+
+```{r}
+kde_childcareSG.ppl <- density(childcareSG_ppp_km, 
+                               sigma=bw.ppl, 
+                               edge=TRUE,
+                               kernel="gaussian")
+par(mfrow=c(1,2))
+plot(kde_childcareSG_km, main = "bw.diggle")
+plot(kde_childcareSG.ppl, main = "bw.ppl")
+```
+
+Working with different kernel methods
+
+By default, the kernel method used in density.ppp() is gaussian. But there are three other options, namely: Epanechnikov, Quartic and Dics.
+
+The code chunk below will be used to compute three more kernel density estimations by using these three kernel function.
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcareSG_ppp_km, 
+             sigma=0.2959712, 
+             edge=TRUE, 
+             kernel="gaussian"), 
+     main="Gaussian")
+plot(density(childcareSG_ppp_km, 
+             sigma=0.2959712, 
+             edge=TRUE, 
+             kernel="epanechnikov"), 
+     main="Epanechnikov")
+plot(density(childcareSG_ppp_km, 
+             sigma=0.2959712, 
+             edge=TRUE, 
+             kernel="quartic"), 
+     main="Quartic")
+plot(density(childcareSG_ppp_km, 
+             sigma=0.2959712, 
+             edge=TRUE, 
+             kernel="disc"), 
+     main="Disc")
+```
+
+
+Fixed and Adaptive KDE
+
+Computing KDE by using fixed bandwidth
+
+Next, you will compute a KDE layer by defining a bandwidth of 600 meter. Notice that in the code chunk below, the sigma value used is 0.6. This is because the unit of measurement of childcareSG_ppp_km object is in kilometer, hence the 600m is 0.6km. 
+
+```{r}
+kde_childcareSG_fb <- density(childcareSG_ppp_km,
+                              sigma=0.6, 
+                              edge=TRUE,
+                              kernel="gaussian")
+plot(kde_childcareSG_fb)
+```
+
+Computing KDE by using adaptive bandwidth
+
+Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. One way to overcome this problem is by using adaptive bandwidth instead.
+
+In this section, you will learn how to derive adaptive kernel density estimation by using density.adaptive() of spatstat.
+
+```{r}
+kde_childcareSG_ab <- adaptive.density(
+  childcareSG_ppp_km, 
+  method="kernel")
+plot(kde_childcareSG_ab)
 ```
 
