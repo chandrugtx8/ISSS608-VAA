@@ -146,6 +146,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
     </ul>
   </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise-1" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise-1">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03a.html">
+ <span class="dropdown-text">In-class Excercise 3a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03b.html">
+ <span class="dropdown-text">In-class Excercise 3a</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
@@ -176,13 +191,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#learning-outcome" id="toc-learning-outcome" class="nav-link" data-scroll-target="#learning-outcome">6.2 Learning Outcome</a></li>
   <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">6.3 The data</a></li>
   <li><a href="#installing-and-loading-the-r-packages" id="toc-installing-and-loading-the-r-packages" class="nav-link" data-scroll-target="#installing-and-loading-the-r-packages"><strong>6.4 Installing and Loading the R packages</strong></a></li>
-  <li><a href="#importing-and-preparing-study-area" id="toc-importing-and-preparing-study-area" class="nav-link" data-scroll-target="#importing-and-preparing-study-area">6.5 Importing and Preparing Study Area</a></li>
+  <li><a href="#importing-and-preparing-study-area" id="toc-importing-and-preparing-study-area" class="nav-link" data-scroll-target="#importing-and-preparing-study-area">6.5 Importing and Preparing Study Area</a>
+  <ul class="collapse">
+  <li><a href="#importing-study-area" id="toc-importing-study-area" class="nav-link" data-scroll-target="#importing-study-area">6.5.1 Importing study area</a></li>
+  <li><a href="#converting-owin-next-as.owin-is-used-to-convert-kbb-into-an-owin-object." id="toc-converting-owin-next-as.owin-is-used-to-convert-kbb-into-an-owin-object." class="nav-link" data-scroll-target="#converting-owin-next-as.owin-is-used-to-convert-kbb-into-an-owin-object.">6.5.2 Converting OWIN Next, as.owin() is used to convert kbb into an owin object.</a></li>
+  </ul></li>
   <li><a href="#importing-and-preparing-forest-fire-data" id="toc-importing-and-preparing-forest-fire-data" class="nav-link" data-scroll-target="#importing-and-preparing-forest-fire-data">6.6 Importing and Preparing Forest Fire data</a></li>
-  <li><a href="#visualising-the-fire-points" id="toc-visualising-the-fire-points" class="nav-link" data-scroll-target="#visualising-the-fire-points">6.7 Visualising the Fire Points</a></li>
+  <li><a href="#visualising-the-fire-points" id="toc-visualising-the-fire-points" class="nav-link" data-scroll-target="#visualising-the-fire-points">6.7 Visualising the Fire Points</a>
+  <ul class="collapse">
   <li><a href="#visuaising-geographic-distribution-of-forest-fires-by-month" id="toc-visuaising-geographic-distribution-of-forest-fires-by-month" class="nav-link" data-scroll-target="#visuaising-geographic-distribution-of-forest-fires-by-month">6.7.2 Visuaising geographic distribution of forest fires by month</a></li>
-  <li><a href="#computing-stkde-by-month" id="toc-computing-stkde-by-month" class="nav-link" data-scroll-target="#computing-stkde-by-month">6.8 Computing STKDE by Month</a></li>
-  <li><a href="#computing-stkde-by-day-of-year" id="toc-computing-stkde-by-day-of-year" class="nav-link" data-scroll-target="#computing-stkde-by-day-of-year">6.9 Computing STKDE by Day of Year</a></li>
-  <li><a href="#computing-stkde-by-day-of-year-improved-method" id="toc-computing-stkde-by-day-of-year-improved-method" class="nav-link" data-scroll-target="#computing-stkde-by-day-of-year-improved-method">6.10 Computing STKDE by Day of Year: Improved method</a></li>
+  </ul></li>
+  <li><a href="#computing-stkde-by-month" id="toc-computing-stkde-by-month" class="nav-link" data-scroll-target="#computing-stkde-by-month">6.8 Computing STKDE by Month</a>
+  <ul class="collapse">
+  <li><a href="#extracting-forest-fires-by-month" id="toc-extracting-forest-fires-by-month" class="nav-link" data-scroll-target="#extracting-forest-fires-by-month">6.8.1 Extracting forest fires by month</a></li>
+  <li><a href="#creating-ppp" id="toc-creating-ppp" class="nav-link" data-scroll-target="#creating-ppp">6.8.2 Creating ppp</a></li>
+  <li><a href="#computing-spatio-temporal-kde" id="toc-computing-spatio-temporal-kde" class="nav-link" data-scroll-target="#computing-spatio-temporal-kde">6.8.4 Computing Spatio-temporal KDE</a></li>
+  <li><a href="#plotting-the-spatio-temporal-kde-object" id="toc-plotting-the-spatio-temporal-kde-object" class="nav-link" data-scroll-target="#plotting-the-spatio-temporal-kde-object">6.8.5 Plotting the spatio-temporal KDE object</a></li>
+  </ul></li>
+  <li><a href="#computing-stkde-by-day-of-year" id="toc-computing-stkde-by-day-of-year" class="nav-link" data-scroll-target="#computing-stkde-by-day-of-year">6.9 Computing STKDE by Day of Year</a>
+  <ul class="collapse">
+  <li><a href="#creating-ppp-object-in-the-code-chunk-below-dayofyear-field-is-included-in-the-output-ppp-object." id="toc-creating-ppp-object-in-the-code-chunk-below-dayofyear-field-is-included-in-the-output-ppp-object." class="nav-link" data-scroll-target="#creating-ppp-object-in-the-code-chunk-below-dayofyear-field-is-included-in-the-output-ppp-object.">6.9.1 Creating ppp object In the code chunk below, DayofYear field is included in the output ppp object.</a></li>
+  <li><a href="#including-owin-object" id="toc-including-owin-object" class="nav-link" data-scroll-target="#including-owin-object">6.9.2 Including Owin object</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section">6.9.3</a></li>
+  </ul></li>
+  <li><a href="#computing-stkde-by-day-of-year-improved-method" id="toc-computing-stkde-by-day-of-year-improved-method" class="nav-link" data-scroll-target="#computing-stkde-by-day-of-year-improved-method">6.10 Computing STKDE by Day of Year: Improved method</a>
+  <ul class="collapse">
+  <li><a href="#computing-spatio-temporal-kde-1" id="toc-computing-spatio-temporal-kde-1" class="nav-link" data-scroll-target="#computing-spatio-temporal-kde-1">6.10.1 Computing spatio-temporal KDE</a></li>
+  <li><a href="#plotting-the-output-spatio-temporal-kde" id="toc-plotting-the-output-spatio-temporal-kde" class="nav-link" data-scroll-target="#plotting-the-output-spatio-temporal-kde">6.10.2 Plotting the output spatio-temporal KDE</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -244,7 +280,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="importing-and-preparing-study-area" class="level2">
 <h2 class="anchored" data-anchor-id="importing-and-preparing-study-area">6.5 Importing and Preparing Study Area</h2>
-<p>6.5.1 Importing study area</p>
+<section id="importing-study-area" class="level3">
+<h3 class="anchored" data-anchor-id="importing-study-area">6.5.1 Importing study area</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>kbb <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"../Hands_on_Ex06/data/rawdata"</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">layer =</span> <span class="st">"Kepulauan_Bangka_Belitung"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -282,7 +319,9 @@ Geodetic CRS:  WGS 84</code></pre>
 <pre><code>st_as_s2(): dropping Z and/or M coordinate</code></pre>
 </div>
 </div>
-<p>6.5.2 Converting OWIN Next, as.owin() is used to convert kbb into an owin object.</p>
+</section>
+<section id="converting-owin-next-as.owin-is-used-to-convert-kbb-into-an-owin-object." class="level3">
+<h3 class="anchored" data-anchor-id="converting-owin-next-as.owin-is-used-to-convert-kbb-into-an-owin-object.">6.5.2 Converting OWIN Next, as.owin() is used to convert kbb into an owin object.</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>kbb_owin <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(kbb_sf)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>kbb_owin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -298,6 +337,7 @@ enclosing rectangle: [512066.8, 705559.4] x [9655398, 9834006] units</code></pre
 <pre><code>[1] "owin"</code></pre>
 </div>
 </div>
+</section>
 </section>
 <section id="importing-and-preparing-forest-fire-data" class="level2">
 <h2 class="anchored" data-anchor-id="importing-and-preparing-forest-fire-data">6.6 Importing and Preparing Forest Fire data</h2>
@@ -344,9 +384,8 @@ date  (1): acq_date
 </div>
 </div>
 </div>
-</section>
-<section id="visuaising-geographic-distribution-of-forest-fires-by-month" class="level2">
-<h2 class="anchored" data-anchor-id="visuaising-geographic-distribution-of-forest-fires-by-month">6.7.2 Visuaising geographic distribution of forest fires by month</h2>
+<section id="visuaising-geographic-distribution-of-forest-fires-by-month" class="level3">
+<h3 class="anchored" data-anchor-id="visuaising-geographic-distribution-of-forest-fires-by-month">6.7.2 Visuaising geographic distribution of forest fires by month</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(kbb_sf)<span class="sc">+</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
@@ -364,16 +403,20 @@ date  (1): acq_date
 </div>
 </div>
 </section>
+</section>
 <section id="computing-stkde-by-month" class="level2">
 <h2 class="anchored" data-anchor-id="computing-stkde-by-month">6.8 Computing STKDE by Month</h2>
 <p>In this section, you will learn how to compute STKDE by using spattemp.density() of sparr package. Before using the function, it is highly recommended you read the function’s reference guide in detail in order to understand the input data requirements and the output object generated.</p>
-<p>6.8.1 Extracting forest fires by month</p>
+<section id="extracting-forest-fires-by-month" class="level3">
+<h3 class="anchored" data-anchor-id="extracting-forest-fires-by-month">6.8.1 Extracting forest fires by month</h3>
 <p>The code chunk below is used to remove the unwanted fields from fire_sf sf data.frame. This is because as.ppp() only need the mark field and geometry field from the input sf data.frame.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fire_month <span class="ot">&lt;-</span> fire_sf <span class="sc">%&gt;%</span> </span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Month_num)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>6.8.2 Creating ppp</p>
+</section>
+<section id="creating-ppp" class="level3">
+<h3 class="anchored" data-anchor-id="creating-ppp">6.8.2 Creating ppp</h3>
 <p>The code chunk below is used to derive a ppp object called fire_month from fire_month sf data.frame.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fire_month_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(fire_month)</span>
@@ -445,7 +488,9 @@ Fraction of frame area: 0.334</code></pre>
 </div>
 </div>
 </div>
-<p>6.8.4 Computing Spatio-temporal KDE</p>
+</section>
+<section id="computing-spatio-temporal-kde" class="level3">
+<h3 class="anchored" data-anchor-id="computing-spatio-temporal-kde">6.8.4 Computing Spatio-temporal KDE</h3>
 <p>Next, spattemp.density() of sparr package is used to compute the STKDE.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>st_kde <span class="ot">&lt;-</span> <span class="fu">spattemp.density</span>(fire_month_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -477,7 +522,9 @@ Evaluation
   Density range: [1.233458e-27, 8.202976e-10]</code></pre>
 </div>
 </div>
-<p>6.8.5 Plotting the spatio-temporal KDE object</p>
+</section>
+<section id="plotting-the-spatio-temporal-kde-object" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-the-spatio-temporal-kde-object">6.8.5 Plotting the spatio-temporal KDE object</h3>
 <p>In the code chunk below, plot() of R base is used to the KDE for between July 2023 - December 2023.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tims <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">11</span>,<span class="dv">12</span>)</span>
@@ -497,16 +544,20 @@ Evaluation
 </div>
 </div>
 </section>
+</section>
 <section id="computing-stkde-by-day-of-year" class="level2">
 <h2 class="anchored" data-anchor-id="computing-stkde-by-day-of-year">6.9 Computing STKDE by Day of Year</h2>
 <p>In this section, you will learn how to computer the STKDE of forest fires by day of year.</p>
-<p>6.9.1 Creating ppp object In the code chunk below, DayofYear field is included in the output ppp object.</p>
+<section id="creating-ppp-object-in-the-code-chunk-below-dayofyear-field-is-included-in-the-output-ppp-object." class="level3">
+<h3 class="anchored" data-anchor-id="creating-ppp-object-in-the-code-chunk-below-dayofyear-field-is-included-in-the-output-ppp-object.">6.9.1 Creating ppp object In the code chunk below, DayofYear field is included in the output ppp object.</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fire_yday_ppp <span class="ot">&lt;-</span> fire_sf <span class="sc">%&gt;%</span> </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(DayofYear) <span class="sc">%&gt;%</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.ppp</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>6.9.2 Including Owin object</p>
+</section>
+<section id="including-owin-object" class="level3">
+<h3 class="anchored" data-anchor-id="including-owin-object">6.9.2 Including Owin object</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>fire_yday_owin <span class="ot">&lt;-</span> fire_yday_ppp[kbb_owin]</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fire_yday_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -529,7 +580,9 @@ Window area = 11533600000 square units
 Fraction of frame area: 0.334</code></pre>
 </div>
 </div>
-<p>6.9.3</p>
+</section>
+<section id="section" class="level3">
+<h3 class="anchored" data-anchor-id="section">6.9.3</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>kde_yday <span class="ot">&lt;-</span> <span class="fu">spattemp.density</span>(</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  fire_yday_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2966,6 +3019,7 @@ Evaluation
 </div>
 </div>
 </section>
+</section>
 <section id="computing-stkde-by-day-of-year-improved-method" class="level2">
 <h2 class="anchored" data-anchor-id="computing-stkde-by-day-of-year-improved-method">6.10 Computing STKDE by Day of Year: Improved method</h2>
 <p>One of the nice function provides in sparr package is BOOT.spattemp(). It support bandwidth selection for standalone spatiotemporal density/intensity based on bootstrap estimation of the MISE, providing an isotropic scalar spatial bandwidth and a scalar temporal bandwidth.</p>
@@ -3015,7 +3069,8 @@ Done.</code></pre>
 9105.73611   18.85762 </code></pre>
 </div>
 </div>
-<p>6.10.1 Computing spatio-temporal KDE</p>
+<section id="computing-spatio-temporal-kde-1" class="level3">
+<h3 class="anchored" data-anchor-id="computing-spatio-temporal-kde-1">6.10.1 Computing spatio-temporal KDE</h3>
 <p>Now, the STKDE will be derived by using h and lambda values derive in previous step.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>kde_yday <span class="ot">&lt;-</span> <span class="fu">spattemp.density</span>(fire_yday_owin,</span>
@@ -3049,7 +3104,9 @@ Evaluation
   Density range: [2.001642e-19, 2.445724e-12]</code></pre>
 </div>
 </div>
-<p>6.10.2 Plotting the output spatio-temporal KDE</p>
+</section>
+<section id="plotting-the-output-spatio-temporal-kde" class="level3">
+<h3 class="anchored" data-anchor-id="plotting-the-output-spatio-temporal-kde">6.10.2 Plotting the output spatio-temporal KDE</h3>
 <p>Last, plot() of sparr package is used to plot the output as shown below.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(kde_yday)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -5457,6 +5514,7 @@ Evaluation
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
