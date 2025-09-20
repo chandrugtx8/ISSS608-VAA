@@ -1,0 +1,96 @@
+---
+title: "In-Class_exercise 4"
+author: "chandru"
+---
+
+```{r}
+pacman::p_load(sf, ggstatsplot, tmap, tidyverse, knitr, GWmodel)
+
+```
+
+
+##  Getting the Data Into R Environment**
+
+In this section, you will learn how to bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv fomat.
+
+### **8.3. Import shapefile into r environment**
+
+The code chunk below uses [*st_read()*](https://r-spatial.github.io/sf/reference/st_read.html) of **sf** package to import Hunan shapefile into R. The imported shapefile will be **simple features** Object of **sf**.
+
+```{r}
+hunan_sf <- st_read(dsn = "../In-class_Ex04/data/geospatial", 
+                 layer = "Hunan")
+```
+
+### **8.3.2 Import csv file into r environment**
+
+Next, we will import *Hunan_2012.csv* into R by using *read_csv()* of **readr** package. The output is R dataframe class.
+
+```{r}
+hunan2012 <- read_csv("../In-class_Ex04/data/aspatial/Hunan_2012.csv")
+```
+
+### **8.3.3 Performing relational join**
+
+The code chunk below will be used to update the attribute table of *hunan*’s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using *left_join()* of **dplyr** package.
+
+```{r}
+hunan_sf <- left_join(hunan_sf,hunan2012) %>%
+  select(1:3, 7,15,16,31,32)
+```
+
+
+
+
+```{r}
+
+hunan_sp <- sf::as_Spatial(hunan_sf)
+
+```
+
+
+cross validation
+
+```{r}
+
+bw_cv<- bw.gwr(GDPPC ~ 1,
+               data=hunan_sf,
+               approach="CV",
+               adaptive= FALSE,
+               kernel = "bisquare",
+               longlat= T)
+bw_cv
+```
+
+
+```{r}
+
+bw_AIC<- bw.gwr(GDPPC ~ 1,
+               data=hunan_sf,
+               approach="AIC",
+               adaptive= FALSE,
+               kernel = "bisquare",
+               longlat= T)
+bw_AIC
+```
+
+```{r}
+
+gwstat<- gwss(
+               data=hunan_sp,
+               vars="GDPPC",
+               bw = bw_AIC,
+               adaptive= FALSE,
+               kernel = "bisquare",
+               longlat= T)
+
+```
+
+```{r}
+gwstat_df<-as.data.frame(gwstat$SDF)
+```
+
+```{r}
+hunan_gstat <- cbind(hunan_sf,gwstat_df)
+```
+
