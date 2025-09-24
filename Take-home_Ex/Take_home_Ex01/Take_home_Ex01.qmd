@@ -1,0 +1,536 @@
+---
+title: "Take Home exercise 1"
+author: "Chandru"
+---
+
+# **2 Installing the required R packages**
+
+| Package | Description |
+|------------------------------------|------------------------------------|
+| [**sf**](https://r-spatial.github.io/sf/) | Provides functions to manage, processing, and manipulate **Simple Features**, a formal geospatial data standard that specifies a storage and access model of spatial geometries such as points, lines, and polygons. |
+| [**spNetwork**](https://cran.r-project.org/web/packages/spNetwork/) | Provides functions to perform Spatial Point Patterns Analysis such as kernel density estimation (KDE) and K-function on network. It also can be used to build spatial matrices (‘listw’ objects like in ‘spdep’ package) to conduct any kind of traditional spatial analysis with spatial weights based on reticular distances. |
+| [**spatstat**](https://spatstat.org/) | Provides functions for spatial statistics with a strong focus on analysing spatial point patterns. |
+| [**raster**](https://cran.r-project.org/web/packages/raster/) | Provides functions which reads, writes, manipulates, analyses and model of gridded spatial data (i.e. raster). In this hands-on exercise, it will be used to convert image output generate by spatstat into raster format. |
+| [**tidyverse**](https://www.tidyverse.org/) | Provides collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data. |
+| [**tmap**](https://cran.r-project.org/web/packages/tmap/) | Provides functions for plotting cartographic quality static point patterns maps or interactive maps by using [leaflet](https://leafletjs.com/) API |
+| [**classInt**](https://cran.r-project.org/web/packages/classInt/index.html) | Provides functions for choosing univariate class intervals for mapping or other graphics purposes. |
+| [**gifski**](https://cran.r-project.org/web/packages/gifski/index.html) | Provides functions to converts images to GIF animations using pngquant’s efficient cross-frame palettes and temporal dithering with thousands of colors per frame. |
+
+```{r}
+pacman::p_load(sf, spNetwork, spatstat, raster, tmap, tidyverse, classInt, gifski,readxl, dplyr, purrr)
+```
+
+# **3 The Data**
+
+```{r}
+# from the project root
+# if _quarto.yml is in Take_home_Ex01/
+data_dir <- file.path("Data", "ACRAInformationonCorporateEntities")
+# or with here():
+# data_dir <- here::here("Data", "ACRAInformationonCorporateEntities")
+
+# sanity checks
+getwd()                       # should be the project root
+dir.exists(data_dir)          # TRUE if path is right
+list.files(data_dir)[1:5]     # quick peek
+
+```
+
+```{r}
+library(readr)
+library(purrr)
+library(dplyr)
+
+# list all CSVs
+files <- list.files("Data/ACRAInformationonCorporateEntities",
+                    pattern = "\\.csv$", full.names = TRUE)
+
+length(files)        # how many files?
+head(basename(files))
+```
+
+```{r}
+
+acra_all <- files |>
+  set_names(basename(files)) |>
+  map_dfr(~ read_csv(.x,
+                     col_types = cols(.default = col_character()), 
+                     guess_max = 100000,
+                     show_col_types = FALSE),
+          .id = "source_file")
+```
+
+```{r}
+glimpse(acra_all)
+```
+
+Filter out the required business entities
+
+```{r}
+library(dplyr)
+library(stringr)
+
+business <- acra_all %>%
+  mutate(
+    primary_ssic_code = as.character(primary_ssic_code),
+    primary_ssic_code = na_if(str_trim(primary_ssic_code), "na")
+  ) %>%
+  filter(!is.na(primary_ssic_code),
+         str_detect(primary_ssic_code, "^(472|474|475)"))
+```
+
+```{r}
+glimpse(business)
+```
+
+adding the ssic code as a seperate column
+
+```{r}
+business <- business %>%
+  mutate(ssic3 = substr(primary_ssic_code, 1, 3))
+```
+
+```{r}
+business %>% count(ssic3, sort = TRUE)
+```
+
+Keep a label for each SSIC band:
+
+```{r}
+ssic_lookup <- tibble::tribble(
+  ~ssic3, ~ssic_label,
+  "472", "Retail sale of food, beverages & tobacco (specialised stores)",
+  "474", "Retail sale of information & communications equipment (specialised stores)",
+  "475", "Retail sale of other household equipment (specialised stores)"
+)
+
+business <- business %>% left_join(ssic_lookup, by = "ssic3")
+```
+
+Extract the business entities registered between 1st January 2024 to 30th June 2025
+
+```{r}
+library(lubridate)
+
+business_recent <- business %>%
+  mutate(uen_issue_date = ymd(uen_issue_date)) %>%
+  filter(uen_issue_date >= ymd("2024-01-01"),
+         uen_issue_date <= ymd("2025-06-30"))
+```
+
+```{r}
+glimpse(business)
+```
+
+```{r}
+head(business, n=5)  
+```
+
+```{r}
+
+names(business_recent)
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(lubridate)
+
+keep_cols <- c(
+  "uen", "entity_name",
+  "uen_issue_date", "registration_incorporation_date",
+  "entity_status_description",
+  "primary_ssic_code", "ssic3", "ssic_label",
+  "address_type", "block", "street_name", "building_name",
+  "level_no", "unit_no", "postal_code"
+)
+
+business_clean <- business_recent %>%
+  # turn literal "na" into real NA
+  mutate(across(where(is.character), ~ na_if(.x, "na"))) %>%
+  # dates & postal code hygiene
+  mutate(
+    uen_issue_date = ymd(uen_issue_date),
+    registration_incorporation_date = ymd(registration_incorporation_date),
+    postal_code = str_pad(str_extract(postal_code, "\\d+"), width = 6, side = "left", pad = "0")
+  ) %>%
+  select(any_of(keep_cols)) %>%
+  distinct()
+```
+
+```{r}
+# show first 2 rows and print every column in the console
+business_clean %>% 
+  slice_head(n = 2) %>% 
+  print(width = Inf)
+
+```
+
+final cleaning
+
+```{r}
+library(dplyr)
+library(stringr)
+library(tidyr)
+
+business_ready <- business_clean %>%
+  # 1) turn literal "na" strings into proper NA for address-ish fields
+  mutate(across(c(entity_name, address_type, block, street_name,
+                  building_name, level_no, unit_no, postal_code),
+                ~ na_if(., "na"))) %>%
+
+  # 3) standardise postal codes to 6 digits; invalids -> NA
+  mutate(
+    postal_code = str_extract(postal_code, "\\d+"),          # keep digits only
+    postal_code = str_pad(postal_code, width = 6, pad = "0"),
+    postal_code = if_else(nchar(postal_code) == 6, postal_code, NA_character_)
+  ) %>%
+
+  # 4) dedupe by UEN (keep earliest issue date; flip to desc() to keep newest)
+  arrange(uen_issue_date) %>%
+  distinct(uen, .keep_all = TRUE) %>%
+
+  # 5) build a full address string for geocoding (keeps original cols too)
+  unite(full_address,
+        c(block, street_name, building_name, level_no, unit_no, postal_code),
+        sep = " ", remove = FALSE, na.rm = TRUE)
+
+# quick sanity peek (shows all columns)
+business_ready %>% slice_head(n = 2) %>% print(width = Inf)
+```
+
+```{r}
+library(httr)
+library(dplyr)
+library(purrr)
+library(tibble)
+
+onemap_geocode_postal <- function(postal_codes) {
+  url <- "https://onemap.gov.sg/api/common/elastic/search"
+
+  # keep unique, 6-digit, non-NA character postcodes
+  pcs <- postal_codes %>%
+    as.character() %>%
+    unique() %>%
+    discard(is.na) %>%
+    keep(~ grepl("^[0-9]{6}$", .x))
+
+  map_dfr(pcs, function(pc) {
+    tryCatch({
+      res <- GET(url, query = list(
+        searchVal      = pc,
+        returnGeom     = "Y",
+        getAddrDetails = "Y",
+        pageNum        = 1
+      ))
+      js <- content(res, as = "parsed", type = "application/json", encoding = "UTF-8")
+
+      if (is.null(js$found) || js$found == 0 || length(js$results) == 0) {
+        tibble(postal_code = pc, lon = NA_real_, lat = NA_real_)
+      } else {
+        r1 <- js$results[[1]]   # first/best match
+        tibble(
+          postal_code = if (!is.null(r1$POSTAL)) r1$POSTAL else pc,
+          lon         = suppressWarnings(as.numeric(r1$LONGITUDE)),
+          lat         = suppressWarnings(as.numeric(r1$LATITUDE))
+        )
+      }
+    }, error = function(e) {
+      tibble(postal_code = pc, lon = NA_real_, lat = NA_real_)
+    })
+  })
+}
+ 
+```
+
+```{r}
+# OPTIONAL: left-pad postal codes to 6 digits if your data has things like "0718"
+# library(stringr)
+# business_ready <- business_ready %>%
+#   mutate(postal_code = ifelse(!is.na(postal_code),
+#                               str_pad(postal_code, 6, pad = "0"),
+#                               postal_code))
+
+pc_lookup <- onemap_geocode_postal(business_ready$postal_code)
+
+business_geo <- business_ready %>%
+  left_join(pc_lookup, by = "postal_code")
+
+# convert to sf (WGS84 -> SVY21)
+library(sf)
+business_sf <- business_geo %>%
+  filter(!is.na(lon), !is.na(lat)) %>%
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>%
+  st_transform(3414)
+```
+
+```{r}
+plot(st_geometry(business_sf), pch = 16, cex = 0.3)
+```
+
+```{r}
+library(sf)
+library(tmap)
+
+mpsz <- st_read("Data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
+  st_zm(drop = TRUE, what = "ZM") |>
+  st_transform(3414) |>
+  st_make_valid()
+
+st_crs(mpsz)$epsg
+st_crs(business_sf)$epsg
+
+tmap_mode("plot")
+
+# with white borders
+tmap_mode("plot")
+tm_shape(mpsz) +
+  tm_polygons(col = "grey90", border = "white") +
+tm_shape(business_sf) +
+  tm_dots(size = 0.02)
+```
+
+# 5. Spatial & Spatio-Temporal Kernel Density Estimation (KDE)
+
+What & why. KDE converts discrete points into a continuous surface of intensity (per km²), helping us see hotspots and low-density zones without imposing administrative boundaries. We compute:
+
+-   an overall KDE for all selected retail entities,
+
+-   three separate KDEs for SSIC 472/474/475, and
+
+-   a monthly KDE (Jan-2024 to Jun-2025) to visualise temporal change.
+
+```{r}
+
+pacman::p_load(
+  sf, dplyr, purrr, stringr, lubridate,
+  tmap, terra,
+  spatstat.geom, spatstat.explore
+)
+
+
+
+
+mpsz_union <- suppressWarnings(st_union(mpsz)) |> st_as_sf()
+sg_owin    <- spatstat.geom::as.owin(mpsz_union)
+
+
+ppp_all     <- spatstat.geom::as.ppp(business_sf)[sg_owin]
+ppp_all_km  <- spatstat.geom::rescale.ppp(ppp_all, 1000, "km")
+
+# 3) Spatial KDE for ALL selected businesses (automatic bandwidth, per-km²)
+bw_all          <- spatstat.explore::bw.ppl(ppp_all_km)
+kde_all_im      <- spatstat.explore::density.ppp(ppp_all_km, sigma = bw_all, edge = TRUE, kernel = "gaussian")
+kde_all_rast    <- terra::rast(kde_all_im); terra::crs(kde_all_rast) <- "EPSG:3414"
+
+# 4) Spatial KDE by 3-digit SSIC (472, 474, 475)
+kde_by_ssic <- function(code, bw_fun = spatstat.explore::bw.ppl) {
+  pts <- dplyr::filter(business_sf, ssic3 == code)
+  if (nrow(pts) < 5) return(NULL)
+  ppp  <- spatstat.geom::as.ppp(pts)[sg_owin]
+  pppk <- spatstat.geom::rescale.ppp(ppp, 1000, "km")
+  bw   <- bw_fun(pppk)
+  im   <- spatstat.explore::density.ppp(pppk, sigma = bw, edge = TRUE, kernel = "gaussian")
+  r    <- terra::rast(im); terra::crs(r) <- "EPSG:3414"
+  r
+}
+
+kde_472 <- kde_by_ssic("472")
+kde_474 <- kde_by_ssic("474")
+kde_475 <- kde_by_ssic("475")
+
+# 5) Spatio-temporal KDE (monthly surfaces from 2024-01 to 2025-06)
+biz_month <- business_sf |>
+  mutate(month = lubridate::floor_date(uen_issue_date, "month")) |>
+  filter(!is.na(month))
+
+make_monthly_kde <- function(sf_month) {
+  if (nrow(sf_month) < 5) return(NULL)
+  ppp  <- spatstat.geom::as.ppp(sf_month)[sg_owin]
+  pppk <- spatstat.geom::rescale.ppp(ppp, 1000, "km")
+  bw   <- spatstat.explore::bw.ppl(pppk)
+  im   <- spatstat.explore::density.ppp(pppk, sigma = bw, edge = TRUE, kernel = "gaussian")
+  r    <- terra::rast(im); terra::crs(r) <- "EPSG:3414"
+  r
+}
+
+kde_monthly <- biz_month |>
+  group_split(month) |>
+  set_names(biz_month |> distinct(month) |> pull(month)) |>
+  map(make_monthly_kde)
+
+# 6) (Optional) Quick maps
+tmap_mode("plot")
+
+# KDE of all businesses
+tm_shape(kde_all_rast) +
+  tm_raster(col.scale = tm_scale_continuous(values = "viridis"),
+            col.legend = tm_legend(title = "KDE (per km²)")) +
+  tm_compass() + tm_scalebar()
+
+# KDE by SSIC (only plotted if not NULL)
+if (!is.null(kde_472)) {
+  tm_shape(kde_472) +
+    tm_raster(col.scale = tm_scale_continuous(values = "magma"),
+              col.legend = tm_legend(title = "KDE 472 (per km²)"))
+}
+if (!is.null(kde_474)) {
+  tm_shape(kde_474) +
+    tm_raster(col.scale = tm_scale_continuous(values = "plasma"),
+              col.legend = tm_legend(title = "KDE 474 (per km²)"))
+}
+if (!is.null(kde_475)) {
+  tm_shape(kde_475) +
+    tm_raster(col.scale = tm_scale_continuous(values = "inferno"),
+              col.legend = tm_legend(title = "KDE 475 (per km²)"))
+}
+
+# Example: plot first available monthly KDE
+ex_month <- names(kde_monthly)[which(!vapply(kde_monthly, is.null, TRUE))][1]
+if (!is.na(ex_month)) {
+  tm_shape(kde_monthly[[ex_month]]) +
+    tm_raster(col.scale = tm_scale_continuous(values = "viridis"),
+              col.legend = tm_legend(title = paste("KDE", ex_month, "(per km²)")))
+}
+
+
+```
+
+# 6. Second-Order Spatial & Spatio-Temporal Analysis (G/F/K/L & Monthly K)
+
+\
+Second-order functions examine *interaction between points* across distances:
+
+-   G(r) nearest-neighbour distribution (point-to-nearest-point).
+
+-   F(r) empty-space distribution (random location to nearest point).
+
+-   K(r) expected points within distance r (global clustering/dispersion).
+
+-   L(r) = sqrt(K/π) variance-stabilised K.
+
+```{r}
+
+
+library(sf)
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(ggplot2)
+library(spatstat.geom)
+library(spatstat.explore)
+
+
+if (!exists("mpsz")) {
+  mpsz <- sf::st_read("Data/MasterPlan2019SubzoneBoundaryNoSeaKML (1).kml") |>
+    sf::st_zm(drop = TRUE, what = "ZM") |>
+    sf::st_transform(3414)
+}
+
+
+mpsz_union <- mpsz |>
+  st_make_valid() |>
+  st_union()
+
+# ensure EPSG:3414
+if (!st_is_longlat(mpsz_union) && !is.na(st_crs(mpsz_union)) && st_crs(mpsz_union)$epsg != 3414) {
+  mpsz_union <- st_transform(mpsz_union, 3414)
+}
+
+win <- as.owin(mpsz_union)
+
+
+sf_to_ppp_km <- function(pts_sf, win) {
+  pts_sf <- pts_sf |> st_drop_geometry() |> cbind(st_coordinates(st_geometry(pts_sf)))
+  stopifnot(all(c("X","Y") %in% names(pts_sf)))
+  X <- pts_sf$X; Y <- pts_sf$Y
+  p <- spatstat.geom::ppp(x = X, y = Y, window = win, checkdup = FALSE)
+  spatstat.geom::rescale.ppp(p, 1000, "km") # metres -> kilometres
+}
+
+sppa_curves <- function(ppp_obj, r_max = 2, step = 0.05) {
+  rseq <- seq(0, r_max, by = step)
+  G <- Gest(ppp_obj, r = rseq, correction = "rs")      |> as.data.frame() |> transmute(stat = "G", r, est = rs)
+  F <- Fest(ppp_obj, r = rseq, correction = "rs")      |> as.data.frame() |> transmute(stat = "F", r, est = rs)
+  K <- Kest(ppp_obj, r = rseq, correction = "Ripley")  |> as.data.frame() |> transmute(stat = "K", r, est = iso)
+  L <- Lest(ppp_obj, r = rseq, correction = "Ripley")  |> as.data.frame() |> transmute(stat = "L", r, est = iso)
+  bind_rows(G, F, K, L)
+}
+
+
+# 6a) OVERALL (all selected businesses together)
+
+stopifnot(inherits(business_sf, "sf"))
+if (st_crs(business_sf)$epsg != 3414) business_sf <- st_transform(business_sf, 3414)
+
+pp_all <- sf_to_ppp_km(business_sf, win)
+curves_all <- sppa_curves(pp_all, r_max = 2, step = 0.05)
+
+ggplot(curves_all, aes(r, est)) +
+  geom_line() +
+  facet_wrap(~ stat, scales = "free_y") +
+  labs(title = "2nd-order functions (overall)",
+       x = "distance (km)", y = "estimate") +
+  theme_minimal(base_size = 12)
+
+
+# 6b) BY SSIC (472 / 474 / 475) 
+
+ssic_groups <- split(
+  subset(business_sf, !is.na(ssic3)),
+  f = subset(business_sf, !is.na(ssic3))$ssic3,
+  drop = TRUE
+)
+
+curves_by_ssic <- purrr::imap(ssic_groups, function(sf_grp, ssic) {
+  if (nrow(sf_grp) == 0) return(NULL)
+  pp <- sf_to_ppp_km(sf_grp, win)
+  sppa_curves(pp, r_max = 2, step = 0.05) |> mutate(ssic3 = ssic)
+}) |> purrr::list_rbind()
+
+ggplot(curves_by_ssic, aes(r, est, colour = ssic3)) +
+  geom_line() +
+  facet_wrap(~ stat, scales = "free_y") +
+  scale_colour_brewer(palette = "Dark2") +
+  labs(title = "2nd-order functions by SSIC",
+       x = "distance (km)", y = "estimate", colour = "SSIC") +
+  theme_minimal(base_size = 12)
+
+
+# 6c) SIMPLE SPATIO-TEMPORAL: K(r) BY MONTH (Jan-2024 .. Jun-2025)
+#     (minimal: observed K only; no envelopes/MC)
+
+biz_month <- business_sf |>
+  mutate(month = floor_date(uen_issue_date, "month")) |>
+  filter(month >= ymd("2024-01-01"), month <= ymd("2025-06-01"))
+
+
+months_ok <- biz_month |>
+  st_drop_geometry() |>
+  count(month) |>
+  filter(n >= 30) |>
+  pull(month)
+
+k_month <- map_dfr(months_ok, function(mo) {
+  sf_grp <- biz_month |> filter(month == mo)
+  pp <- sf_to_ppp_km(sf_grp, win)
+  rseq <- seq(0, 2, by = 0.05)
+  K <- Kest(pp, r = rseq, correction = "Ripley") |> as.data.frame()
+  tibble(month = format(mo, "%Y-%m"), r = K$r, K = K$iso)
+})
+
+ggplot(k_month, aes(r, K, colour = month, group = month)) +
+  geom_line(linewidth = 0.7) +
+  labs(title = "Spatio-temporal K(r) by month (observed)",
+       x = "distance (km)", y = "K(r)", colour = "Month") +
+  theme_minimal(base_size = 12)
+
+```
+
+The analyses give a multi-scale view of retail formation. First, KDE maps show where activity happens without being bound by administrative boundaries. This is useful for town-centre improvement, station-area planning and gaps in everyday retail. For example high 472 near dense estates shows the importance of walkable, mixed-use centres; planners can protect ground-floor frontages and human-scale streets where concentrations are sustainable. Low intensities in green belts and industrial areas reflect land-use intent rather than unmet need, avoiding false signals.
+
+Second, type-specific KDEs show different retail categories go to different urban morphologies: daily-necessity (472) clusters in neighbourhood hubs; ICT (474) anchors in regional malls/transport nodes; household goods (475) follow larger floorplate corridors. This can inform tenant mix, zoning flexibility and logistics/parking provisions. For example ICT and household goods may benefit from transit adjacency and consolidated loading, while 472 needs fine-grain street networks and pedestrian priority.
+
+Third, second-order stats (G/F/K/L) show short-range clustering is robust and consistent with agglomeration economies (shared footfall, complementary offers, brand variety). Recognising these natural scales helps calibrate allowable frontage lengths, plot amalgamation rules and capex for place-making (e.g. shaded arcades, seating, micro-squares) that support cluster health. Policymakers can encourage temporal spread (e.g. evening economy) to maximise centre vitality without over-concentration.
+
+Finally the spatio-temporal view suggests incremental growth rather than sudden relocations. This stability supports phased improvements (streetscape, wayfinding, cycling access) and targeted grants to strengthen fragile centres. Where demand is thin, tactical urbanism (pop-ups/markets) can test viability before committing permanent space. Overall, combining KDE with second-order diagnostics gives a practical evidence base for retail-centre hierarchy planning, land-use safeguarding and investment prioritisation that aligns with accessibility and liveability.

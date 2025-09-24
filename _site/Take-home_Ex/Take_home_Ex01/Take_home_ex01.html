@@ -8,7 +8,7 @@
 
 <meta name="author" content="Chandru">
 
-<title>Take-home Exercise 1 – ISSS608-VAA</title>
+<title>Take Home exercise 1 – ISSS608-VAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -151,10 +151,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise-1" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Hands-on Exercise</span>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-Class Exercise</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise-1">    
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03a.html">
  <span class="dropdown-text">In-class Excercise 3a</span></a>
@@ -162,6 +162,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03b.html">
  <span class="dropdown-text">In-class Excercise 3b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex04.html">
+ <span class="dropdown-text">In-class Excercise 4</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take Home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take_home_Ex01/Take_home_Ex01.html">
+ <span class="dropdown-text">Take Home Excercise 1</span></a>
   </li>  
     </ul>
   </li>
@@ -193,6 +208,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#installing-the-required-r-packages" id="toc-installing-the-required-r-packages" class="nav-link active" data-scroll-target="#installing-the-required-r-packages"><strong>2 Installing the required R packages</strong></a></li>
   <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><strong>3 The Data</strong></a></li>
+  <li><a href="#spatial-spatio-temporal-kernel-density-estimation-kde" id="toc-spatial-spatio-temporal-kernel-density-estimation-kde" class="nav-link" data-scroll-target="#spatial-spatio-temporal-kernel-density-estimation-kde">5. Spatial &amp; Spatio-Temporal Kernel Density Estimation (KDE)</a></li>
+  <li><a href="#second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k" id="toc-second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k" class="nav-link" data-scroll-target="#second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k">6. Second-Order Spatial &amp; Spatio-Temporal Analysis (G/F/K/L &amp; Monthly K)</a></li>
   </ul>
 </nav>
     </div>
@@ -201,7 +218,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Take-home Exercise 1</h1>
+<h1 class="title">Take Home exercise 1</h1>
 </div>
 
 
@@ -275,20 +292,863 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="the-data" class="level1">
 <h1><strong>3 The Data</strong></h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data_dir <span class="ot">&lt;-</span> <span class="st">"Data/ACRAInformationonCorporateEntities"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># list all .xls/.xlsx files in that folder</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(data_dir, <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">.xls[x]?$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(files)      <span class="co"># should be &gt; 0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the project root</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># if _quarto.yml is in Take_home_Ex01/</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">"Data"</span>, <span class="st">"ACRAInformationonCorporateEntities"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># or with here():</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># data_dir &lt;- here::here("Data", "ACRAInformationonCorporateEntities")</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># sanity checks</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">getwd</span>()                       <span class="co"># should be the project root</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] "C:/Users/kchan/Desktop/chandru-ko/ISSS608-VAA/Take-home_Ex/Take_home_Ex01"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(files, <span class="dv">3</span>)     <span class="co"># quick peek</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.exists</span>(data_dir)          <span class="co"># TRUE if path is right</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>character(0)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(data_dir)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]     <span class="co"># quick peek</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ACRA Information on Corporate Entities ('A').csv"
+[2] "ACRA Information on Corporate Entities ('B').csv"
+[3] "ACRA Information on Corporate Entities ('C').csv"
+[4] "ACRA Information on Corporate Entities ('D').csv"
+[5] "ACRA Information on Corporate Entities ('E').csv"</code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># list all CSVs</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"Data/ACRAInformationonCorporateEntities"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">pattern =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">.csv$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(files)        <span class="co"># how many files?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 27</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">basename</span>(files))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ACRA Information on Corporate Entities ('A').csv"
+[2] "ACRA Information on Corporate Entities ('B').csv"
+[3] "ACRA Information on Corporate Entities ('C').csv"
+[4] "ACRA Information on Corporate Entities ('D').csv"
+[5] "ACRA Information on Corporate Entities ('E').csv"
+[6] "ACRA Information on Corporate Entities ('F').csv"</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>acra_all <span class="ot">&lt;-</span> files <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">basename</span>(files)) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(<span class="sc">~</span> <span class="fu">read_csv</span>(.x,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">.default =</span> <span class="fu">col_character</span>()), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">guess_max =</span> <span class="dv">100000</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">show_col_types =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">.id =</span> <span class="st">"source_file"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(acra_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 2,026,935
+Columns: 54
+$ source_file                       &lt;chr&gt; "ACRA Information on Corporate Entit…
+$ uen                               &lt;chr&gt; "00022100K", "00031800X", "00043100A…
+$ issuance_agency_id                &lt;chr&gt; "ACRA", "ACRA", "ACRA", "ACRA", "ACR…
+$ entity_name                       &lt;chr&gt; "A Y ABDUL RAHIMAN", "A M ABDULLAH S…
+$ entity_type_description           &lt;chr&gt; "Sole Proprietorship/ Partnership", …
+$ business_constitution_description &lt;chr&gt; "Partnership", "Partnership", "Partn…
+$ company_type_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ paf_constitution_description      &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ entity_status_description         &lt;chr&gt; "Terminated", "Terminated", "Termina…
+$ registration_incorporation_date   &lt;chr&gt; "1974-10-09", "1974-10-12", "1974-09…
+$ uen_issue_date                    &lt;chr&gt; "1974-10-09", "1974-10-12", "1974-09…
+$ address_type                      &lt;chr&gt; "LOCAL", "LOCAL", "LOCAL", "LOCAL", …
+$ block                             &lt;chr&gt; "51", "93", "178", "21", "30", "38A"…
+$ street_name                       &lt;chr&gt; "EAST COAST ROAD", "MARKET STREET", …
+$ level_no                          &lt;chr&gt; "na", "10", "na", "na", "na", "na", …
+$ unit_no                           &lt;chr&gt; "na", "01", "na", "na", "na", "na", …
+$ building_name                     &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ postal_code                       &lt;chr&gt; "428770", "0104", "0718", "0923", "4…
+$ other_address_line1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ other_address_line2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ account_due_date                  &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ annual_return_date                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_ssic_code                 &lt;chr&gt; "47722", "46301", "68104", "56111", …
+$ primary_ssic_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_user_described_activity   &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_ssic_code               &lt;chr&gt; "na", "32909", "na", "56122", "na", …
+$ secondary_ssic_description        &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_user_described_activity &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ no_of_officers                    &lt;chr&gt; "7", "6", "3", "1", "5", "2", "2", "…
+$ former_entity_name1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name6               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name7               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name8               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name9               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name10              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name11              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name12              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name13              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name14              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name15              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm1                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm2                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm3                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm4                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm5                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …</code></pre>
+</div>
+</div>
+<p>Filter out the required business entities</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>business <span class="ot">&lt;-</span> acra_all <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">primary_ssic_code =</span> <span class="fu">as.character</span>(primary_ssic_code),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">primary_ssic_code =</span> <span class="fu">na_if</span>(<span class="fu">str_trim</span>(primary_ssic_code), <span class="st">"na"</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(primary_ssic_code),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>         <span class="fu">str_detect</span>(primary_ssic_code, <span class="st">"^(472|474|475)"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(business)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 62,281
+Columns: 54
+$ source_file                       &lt;chr&gt; "ACRA Information on Corporate Entit…
+$ uen                               &lt;chr&gt; "00100500J", "00202400D", "00205900B…
+$ issuance_agency_id                &lt;chr&gt; "ACRA", "ACRA", "ACRA", "ACRA", "ACR…
+$ entity_name                       &lt;chr&gt; "A K NAINA MOHAMED", "ANG LEONG HUAT…
+$ entity_type_description           &lt;chr&gt; "Sole Proprietorship/ Partnership", …
+$ business_constitution_description &lt;chr&gt; "Sole-Proprietor", "Sole-Proprietor"…
+$ company_type_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ paf_constitution_description      &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ entity_status_description         &lt;chr&gt; "Terminated", "Terminated", "Termina…
+$ registration_incorporation_date   &lt;chr&gt; "1974-09-19", "1974-09-27", "1974-09…
+$ uen_issue_date                    &lt;chr&gt; "1974-09-19", "1974-09-27", "1974-09…
+$ address_type                      &lt;chr&gt; "LOCAL", "LOCAL", "LOCAL", "LOCAL", …
+$ block                             &lt;chr&gt; "233", "20", "33", "67", "12", "67",…
+$ street_name                       &lt;chr&gt; "MIDDLE ROAD", "WELD ROAD", "PURVIS …
+$ level_no                          &lt;chr&gt; "na", "na", "na", "07", "na", "01", …
+$ unit_no                           &lt;chr&gt; "na", "na", "na", "04", "na", "222",…
+$ building_name                     &lt;chr&gt; "na", "na", "na", "SATNAM HOUSE", "n…
+$ postal_code                       &lt;chr&gt; "0718", "207239", "188610", "179431"…
+$ other_address_line1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ other_address_line2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ account_due_date                  &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ annual_return_date                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_ssic_code                 &lt;chr&gt; "47230", "47220", "47212", "47510", …
+$ primary_ssic_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_user_described_activity   &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_ssic_code               &lt;chr&gt; "46100", "46900", "na", "na", "na", …
+$ secondary_ssic_description        &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_user_described_activity &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ no_of_officers                    &lt;chr&gt; "1", "3", "1", "4", "3", "2", "4", "…
+$ former_entity_name1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name6               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name7               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name8               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name9               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name10              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name11              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name12              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name13              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name14              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name15              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm1                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm2                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm3                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm4                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm5                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …</code></pre>
+</div>
+</div>
+<p>adding the ssic code as a seperate column</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>business <span class="ot">&lt;-</span> business <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ssic3 =</span> <span class="fu">substr</span>(primary_ssic_code, <span class="dv">1</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>business <span class="sc">%&gt;%</span> <span class="fu">count</span>(ssic3, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  ssic3     n
+  &lt;chr&gt; &lt;int&gt;
+1 472   25202
+2 475   20400
+3 474   16679</code></pre>
+</div>
+</div>
+<p>Keep a label for each SSIC band:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ssic_lookup <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>ssic3, <span class="sc">~</span>ssic_label,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"472"</span>, <span class="st">"Retail sale of food, beverages &amp; tobacco (specialised stores)"</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"474"</span>, <span class="st">"Retail sale of information &amp; communications equipment (specialised stores)"</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"475"</span>, <span class="st">"Retail sale of other household equipment (specialised stores)"</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>business <span class="ot">&lt;-</span> business <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(ssic_lookup, <span class="at">by =</span> <span class="st">"ssic3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Extract the business entities registered between 1st January 2024 to 30th June 2025</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>business_recent <span class="ot">&lt;-</span> business <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">uen_issue_date =</span> <span class="fu">ymd</span>(uen_issue_date)) <span class="sc">%&gt;%</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(uen_issue_date <span class="sc">&gt;=</span> <span class="fu">ymd</span>(<span class="st">"2024-01-01"</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>         uen_issue_date <span class="sc">&lt;=</span> <span class="fu">ymd</span>(<span class="st">"2025-06-30"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(business)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 62,281
+Columns: 56
+$ source_file                       &lt;chr&gt; "ACRA Information on Corporate Entit…
+$ uen                               &lt;chr&gt; "00100500J", "00202400D", "00205900B…
+$ issuance_agency_id                &lt;chr&gt; "ACRA", "ACRA", "ACRA", "ACRA", "ACR…
+$ entity_name                       &lt;chr&gt; "A K NAINA MOHAMED", "ANG LEONG HUAT…
+$ entity_type_description           &lt;chr&gt; "Sole Proprietorship/ Partnership", …
+$ business_constitution_description &lt;chr&gt; "Sole-Proprietor", "Sole-Proprietor"…
+$ company_type_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ paf_constitution_description      &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ entity_status_description         &lt;chr&gt; "Terminated", "Terminated", "Termina…
+$ registration_incorporation_date   &lt;chr&gt; "1974-09-19", "1974-09-27", "1974-09…
+$ uen_issue_date                    &lt;chr&gt; "1974-09-19", "1974-09-27", "1974-09…
+$ address_type                      &lt;chr&gt; "LOCAL", "LOCAL", "LOCAL", "LOCAL", …
+$ block                             &lt;chr&gt; "233", "20", "33", "67", "12", "67",…
+$ street_name                       &lt;chr&gt; "MIDDLE ROAD", "WELD ROAD", "PURVIS …
+$ level_no                          &lt;chr&gt; "na", "na", "na", "07", "na", "01", …
+$ unit_no                           &lt;chr&gt; "na", "na", "na", "04", "na", "222",…
+$ building_name                     &lt;chr&gt; "na", "na", "na", "SATNAM HOUSE", "n…
+$ postal_code                       &lt;chr&gt; "0718", "207239", "188610", "179431"…
+$ other_address_line1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ other_address_line2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ account_due_date                  &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ annual_return_date                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_ssic_code                 &lt;chr&gt; "47230", "47220", "47212", "47510", …
+$ primary_ssic_description          &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ primary_user_described_activity   &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_ssic_code               &lt;chr&gt; "46100", "46900", "na", "na", "na", …
+$ secondary_ssic_description        &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ secondary_user_described_activity &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ no_of_officers                    &lt;chr&gt; "1", "3", "1", "4", "3", "2", "4", "…
+$ former_entity_name1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name6               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name7               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name8               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name9               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name10              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name11              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name12              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name13              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name14              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ former_entity_name15              &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm1                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm1               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm2                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm2               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm3                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm3               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm4                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm4               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ uen_of_audit_firm5                &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …
+$ ssic3                             &lt;chr&gt; "472", "472", "472", "475", "472", "…
+$ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages &amp; to…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(business, <span class="at">n=</span><span class="dv">5</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 56
+  source_file        uen   issuance_agency_id entity_name entity_type_descript…¹
+  &lt;chr&gt;              &lt;chr&gt; &lt;chr&gt;              &lt;chr&gt;       &lt;chr&gt;                 
+1 ACRA Information … 0010… ACRA               A K NAINA … Sole Proprietorship/ …
+2 ACRA Information … 0020… ACRA               ANG LEONG … Sole Proprietorship/ …
+3 ACRA Information … 0020… ACRA               AIK JUAN    Sole Proprietorship/ …
+4 ACRA Information … 0053… ACRA               A WOOSENSA… Sole Proprietorship/ …
+5 ACRA Information … 0082… ACRA               AIK HOE &amp; … Sole Proprietorship/ …
+# ℹ abbreviated name: ¹​entity_type_description
+# ℹ 51 more variables: business_constitution_description &lt;chr&gt;,
+#   company_type_description &lt;chr&gt;, paf_constitution_description &lt;chr&gt;,
+#   entity_status_description &lt;chr&gt;, registration_incorporation_date &lt;chr&gt;,
+#   uen_issue_date &lt;chr&gt;, address_type &lt;chr&gt;, block &lt;chr&gt;, street_name &lt;chr&gt;,
+#   level_no &lt;chr&gt;, unit_no &lt;chr&gt;, building_name &lt;chr&gt;, postal_code &lt;chr&gt;,
+#   other_address_line1 &lt;chr&gt;, other_address_line2 &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(business_recent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "source_file"                       "uen"                              
+ [3] "issuance_agency_id"                "entity_name"                      
+ [5] "entity_type_description"           "business_constitution_description"
+ [7] "company_type_description"          "paf_constitution_description"     
+ [9] "entity_status_description"         "registration_incorporation_date"  
+[11] "uen_issue_date"                    "address_type"                     
+[13] "block"                             "street_name"                      
+[15] "level_no"                          "unit_no"                          
+[17] "building_name"                     "postal_code"                      
+[19] "other_address_line1"               "other_address_line2"              
+[21] "account_due_date"                  "annual_return_date"               
+[23] "primary_ssic_code"                 "primary_ssic_description"         
+[25] "primary_user_described_activity"   "secondary_ssic_code"              
+[27] "secondary_ssic_description"        "secondary_user_described_activity"
+[29] "no_of_officers"                    "former_entity_name1"              
+[31] "former_entity_name2"               "former_entity_name3"              
+[33] "former_entity_name4"               "former_entity_name5"              
+[35] "former_entity_name6"               "former_entity_name7"              
+[37] "former_entity_name8"               "former_entity_name9"              
+[39] "former_entity_name10"              "former_entity_name11"             
+[41] "former_entity_name12"              "former_entity_name13"             
+[43] "former_entity_name14"              "former_entity_name15"             
+[45] "uen_of_audit_firm1"                "name_of_audit_firm1"              
+[47] "uen_of_audit_firm2"                "name_of_audit_firm2"              
+[49] "uen_of_audit_firm3"                "name_of_audit_firm3"              
+[51] "uen_of_audit_firm4"                "name_of_audit_firm4"              
+[53] "uen_of_audit_firm5"                "name_of_audit_firm5"              
+[55] "ssic3"                             "ssic_label"                       </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>keep_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"uen"</span>, <span class="st">"entity_name"</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"uen_issue_date"</span>, <span class="st">"registration_incorporation_date"</span>,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"entity_status_description"</span>,</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"primary_ssic_code"</span>, <span class="st">"ssic3"</span>, <span class="st">"ssic_label"</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"address_type"</span>, <span class="st">"block"</span>, <span class="st">"street_name"</span>, <span class="st">"building_name"</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"level_no"</span>, <span class="st">"unit_no"</span>, <span class="st">"postal_code"</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>business_clean <span class="ot">&lt;-</span> business_recent <span class="sc">%&gt;%</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># turn literal "na" into real NA</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), <span class="sc">~</span> <span class="fu">na_if</span>(.x, <span class="st">"na"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># dates &amp; postal code hygiene</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">uen_issue_date =</span> <span class="fu">ymd</span>(uen_issue_date),</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">registration_incorporation_date =</span> <span class="fu">ymd</span>(registration_incorporation_date),</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">postal_code =</span> <span class="fu">str_pad</span>(<span class="fu">str_extract</span>(postal_code, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>), <span class="at">width =</span> <span class="dv">6</span>, <span class="at">side =</span> <span class="st">"left"</span>, <span class="at">pad =</span> <span class="st">"0"</span>)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">any_of</span>(keep_cols)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># show first 2 rows and print every column in the console</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>business_clean <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">width =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 15
+  uen        entity_name          uen_issue_date registration_incorporation_date
+  &lt;chr&gt;      &lt;chr&gt;                &lt;date&gt;         &lt;date&gt;                         
+1 202400088M AEMN GROUP PTE. LTD. 2024-03-13     2024-03-13                     
+2 202400583K AIWANG PTE. LTD.     2024-01-03     2024-01-03                     
+  entity_status_description primary_ssic_code ssic3
+  &lt;chr&gt;                     &lt;chr&gt;             &lt;chr&gt;
+1 Live Company              47220             472  
+2 Live Company              47219             472  
+  ssic_label                                                    address_type
+  &lt;chr&gt;                                                         &lt;chr&gt;       
+1 Retail sale of food, beverages &amp; tobacco (specialised stores) LOCAL       
+2 Retail sale of food, beverages &amp; tobacco (specialised stores) LOCAL       
+  block street_name          building_name    level_no unit_no postal_code
+  &lt;chr&gt; &lt;chr&gt;                &lt;chr&gt;            &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      
+1 6     BATTERY ROAD         SIX BATTERY ROAD 33       01      049909     
+2 1550  BEDOK NORTH AVENUE 4 &lt;NA&gt;             03       24      489950     </code></pre>
+</div>
+</div>
+<p>final cleaning</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>business_ready <span class="ot">&lt;-</span> business_clean <span class="sc">%&gt;%</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1) turn literal "na" strings into proper NA for address-ish fields</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(entity_name, address_type, block, street_name,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                  building_name, level_no, unit_no, postal_code),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">na_if</span>(., <span class="st">"na"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3) standardise postal codes to 6 digits; invalids -&gt; NA</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">postal_code =</span> <span class="fu">str_extract</span>(postal_code, <span class="st">"</span><span class="sc">\\</span><span class="st">d+"</span>),          <span class="co"># keep digits only</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">postal_code =</span> <span class="fu">str_pad</span>(postal_code, <span class="at">width =</span> <span class="dv">6</span>, <span class="at">pad =</span> <span class="st">"0"</span>),</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">postal_code =</span> <span class="fu">if_else</span>(<span class="fu">nchar</span>(postal_code) <span class="sc">==</span> <span class="dv">6</span>, postal_code, <span class="cn">NA_character_</span>)</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 4) dedupe by UEN (keep earliest issue date; flip to desc() to keep newest)</span></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(uen_issue_date) <span class="sc">%&gt;%</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(uen, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 5) build a full address string for geocoding (keeps original cols too)</span></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(full_address,</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">c</span>(block, street_name, building_name, level_no, unit_no, postal_code),</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>        <span class="at">sep =</span> <span class="st">" "</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a><span class="co"># quick sanity peek (shows all columns)</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>business_ready <span class="sc">%&gt;%</span> <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">print</span>(<span class="at">width =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 16
+  uen       entity_name uen_issue_date registration_incorporation_date
+  &lt;chr&gt;     &lt;chr&gt;       &lt;date&gt;         &lt;date&gt;                         
+1 53478643W S TIER      2024-01-01     2024-01-01                     
+2 53478712J BELINKS     2024-01-02     2024-01-02                     
+  entity_status_description primary_ssic_code ssic3
+  &lt;chr&gt;                     &lt;chr&gt;             &lt;chr&gt;
+1 Ceased Registration       47412             474  
+2 Live                      47219             472  
+  ssic_label                                                                
+  &lt;chr&gt;                                                                     
+1 Retail sale of information &amp; communications equipment (specialised stores)
+2 Retail sale of food, beverages &amp; tobacco (specialised stores)             
+  address_type full_address                           block street_name     
+  &lt;chr&gt;        &lt;chr&gt;                                  &lt;chr&gt; &lt;chr&gt;           
+1 LOCAL        33 TERRASSE LANE TERRASSE 02 72 544780 33    TERRASSE LANE   
+2 LOCAL        178 BISHAN STREET 13 08 213 570178     178   BISHAN STREET 13
+  building_name level_no unit_no postal_code
+  &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      
+1 TERRASSE      02       72      544780     
+2 &lt;NA&gt;          08       213     570178     </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>onemap_geocode_postal <span class="ot">&lt;-</span> <span class="cf">function</span>(postal_codes) {</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># keep unique, 6-digit, non-NA character postcodes</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  pcs <span class="ot">&lt;-</span> postal_codes <span class="sc">%&gt;%</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.character</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">discard</span>(is.na) <span class="sc">%&gt;%</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">keep</span>(<span class="sc">~</span> <span class="fu">grepl</span>(<span class="st">"^[0-9]{6}$"</span>, .x))</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_dfr</span>(pcs, <span class="cf">function</span>(pc) {</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tryCatch</span>({</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>      res <span class="ot">&lt;-</span> <span class="fu">GET</span>(url, <span class="at">query =</span> <span class="fu">list</span>(</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">searchVal      =</span> pc,</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">returnGeom     =</span> <span class="st">"Y"</span>,</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">getAddrDetails =</span> <span class="st">"Y"</span>,</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">pageNum        =</span> <span class="dv">1</span></span>
+<span id="cb34-23"><a href="#cb34-23" aria-hidden="true" tabindex="-1"></a>      ))</span>
+<span id="cb34-24"><a href="#cb34-24" aria-hidden="true" tabindex="-1"></a>      js <span class="ot">&lt;-</span> <span class="fu">content</span>(res, <span class="at">as =</span> <span class="st">"parsed"</span>, <span class="at">type =</span> <span class="st">"application/json"</span>, <span class="at">encoding =</span> <span class="st">"UTF-8"</span>)</span>
+<span id="cb34-25"><a href="#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-26"><a href="#cb34-26" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">is.null</span>(js<span class="sc">$</span>found) <span class="sc">||</span> js<span class="sc">$</span>found <span class="sc">==</span> <span class="dv">0</span> <span class="sc">||</span> <span class="fu">length</span>(js<span class="sc">$</span>results) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb34-27"><a href="#cb34-27" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tibble</span>(<span class="at">postal_code =</span> pc, <span class="at">lon =</span> <span class="cn">NA_real_</span>, <span class="at">lat =</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb34-28"><a href="#cb34-28" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb34-29"><a href="#cb34-29" aria-hidden="true" tabindex="-1"></a>        r1 <span class="ot">&lt;-</span> js<span class="sc">$</span>results[[<span class="dv">1</span>]]   <span class="co"># first/best match</span></span>
+<span id="cb34-30"><a href="#cb34-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tibble</span>(</span>
+<span id="cb34-31"><a href="#cb34-31" aria-hidden="true" tabindex="-1"></a>          <span class="at">postal_code =</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(r1<span class="sc">$</span>POSTAL)) r1<span class="sc">$</span>POSTAL <span class="cf">else</span> pc,</span>
+<span id="cb34-32"><a href="#cb34-32" aria-hidden="true" tabindex="-1"></a>          <span class="at">lon         =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.numeric</span>(r1<span class="sc">$</span>LONGITUDE)),</span>
+<span id="cb34-33"><a href="#cb34-33" aria-hidden="true" tabindex="-1"></a>          <span class="at">lat         =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.numeric</span>(r1<span class="sc">$</span>LATITUDE))</span>
+<span id="cb34-34"><a href="#cb34-34" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb34-35"><a href="#cb34-35" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb34-36"><a href="#cb34-36" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb34-37"><a href="#cb34-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tibble</span>(<span class="at">postal_code =</span> pc, <span class="at">lon =</span> <span class="cn">NA_real_</span>, <span class="at">lat =</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb34-38"><a href="#cb34-38" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OPTIONAL: left-pad postal codes to 6 digits if your data has things like "0718"</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(stringr)</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># business_ready &lt;- business_ready %&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(postal_code = ifelse(!is.na(postal_code),</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                               str_pad(postal_code, 6, pad = "0"),</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                               postal_code))</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>pc_lookup <span class="ot">&lt;-</span> <span class="fu">onemap_geocode_postal</span>(business_ready<span class="sc">$</span>postal_code)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>business_geo <span class="ot">&lt;-</span> business_ready <span class="sc">%&gt;%</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(pc_lookup, <span class="at">by =</span> <span class="st">"postal_code"</span>)</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to sf (WGS84 -&gt; SVY21)</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>business_sf <span class="ot">&lt;-</span> business_geo <span class="sc">%&gt;%</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(lon), <span class="sc">!</span><span class="fu">is.na</span>(lat)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(business_sf), <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"Data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_zm</span>(<span class="at">drop =</span> <span class="cn">TRUE</span>, <span class="at">what =</span> <span class="st">"ZM"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">3414</span>) <span class="sc">|&gt;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_make_valid</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `URA_MP19_SUBZONE_NO_SEA_PL' from data source 
+  `C:\Users\kchan\Desktop\chandru-ko\ISSS608-VAA\Take-home_Ex\Take_home_Ex01\Data\MasterPlan2019SubzoneBoundaryNoSeaKML.kml' 
+  using driver `KML'
+Simple feature collection with 332 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mpsz)<span class="sc">$</span>epsg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3414</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(business_sf)<span class="sc">$</span>epsg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3414</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># with white borders</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz) <span class="sc">+</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"grey90"</span>, <span class="at">border =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(business_sf) <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">size =</span> <span class="fl">0.02</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[tm_polygons()] Argument `border` unknown.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="spatial-spatio-temporal-kernel-density-estimation-kde" class="level1">
+<h1>5. Spatial &amp; Spatio-Temporal Kernel Density Estimation (KDE)</h1>
+<p>What &amp; why. KDE converts discrete points into a continuous surface of intensity (per km²), helping us see hotspots and low-density zones without imposing administrative boundaries. We compute:</p>
+<ul>
+<li><p>an overall KDE for all selected retail entities,</p></li>
+<li><p>three separate KDEs for SSIC 472/474/475, and</p></li>
+<li><p>a monthly KDE (Jan-2024 to Jun-2025) to visualise temporal change.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  sf, dplyr, purrr, stringr, lubridate,</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  tmap, terra,</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  spatstat.geom, spatstat.explore</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>mpsz_union <span class="ot">&lt;-</span> <span class="fu">suppressWarnings</span>(<span class="fu">st_union</span>(mpsz)) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>()</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>sg_owin    <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">as.owin</span>(mpsz_union)</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>ppp_all     <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">as.ppp</span>(business_sf)[sg_owin]</span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>ppp_all_km  <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">rescale.ppp</span>(ppp_all, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Spatial KDE for ALL selected businesses (automatic bandwidth, per-km²)</span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>bw_all          <span class="ot">&lt;-</span> spatstat.explore<span class="sc">::</span><span class="fu">bw.ppl</span>(ppp_all_km)</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>kde_all_im      <span class="ot">&lt;-</span> spatstat.explore<span class="sc">::</span><span class="fu">density.ppp</span>(ppp_all_km, <span class="at">sigma =</span> bw_all, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>kde_all_rast    <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(kde_all_im); terra<span class="sc">::</span><span class="fu">crs</span>(kde_all_rast) <span class="ot">&lt;-</span> <span class="st">"EPSG:3414"</span></span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) Spatial KDE by 3-digit SSIC (472, 474, 475)</span></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>kde_by_ssic <span class="ot">&lt;-</span> <span class="cf">function</span>(code, <span class="at">bw_fun =</span> spatstat.explore<span class="sc">::</span>bw.ppl) {</span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>  pts <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(business_sf, ssic3 <span class="sc">==</span> code)</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(pts) <span class="sc">&lt;</span> <span class="dv">5</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a>  ppp  <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">as.ppp</span>(pts)[sg_owin]</span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>  pppk <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">rescale.ppp</span>(ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a>  bw   <span class="ot">&lt;-</span> <span class="fu">bw_fun</span>(pppk)</span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a>  im   <span class="ot">&lt;-</span> spatstat.explore<span class="sc">::</span><span class="fu">density.ppp</span>(pppk, <span class="at">sigma =</span> bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>  r    <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(im); terra<span class="sc">::</span><span class="fu">crs</span>(r) <span class="ot">&lt;-</span> <span class="st">"EPSG:3414"</span></span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>  r</span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>kde_472 <span class="ot">&lt;-</span> <span class="fu">kde_by_ssic</span>(<span class="st">"472"</span>)</span>
+<span id="cb49-35"><a href="#cb49-35" aria-hidden="true" tabindex="-1"></a>kde_474 <span class="ot">&lt;-</span> <span class="fu">kde_by_ssic</span>(<span class="st">"474"</span>)</span>
+<span id="cb49-36"><a href="#cb49-36" aria-hidden="true" tabindex="-1"></a>kde_475 <span class="ot">&lt;-</span> <span class="fu">kde_by_ssic</span>(<span class="st">"475"</span>)</span>
+<span id="cb49-37"><a href="#cb49-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-38"><a href="#cb49-38" aria-hidden="true" tabindex="-1"></a><span class="co"># 5) Spatio-temporal KDE (monthly surfaces from 2024-01 to 2025-06)</span></span>
+<span id="cb49-39"><a href="#cb49-39" aria-hidden="true" tabindex="-1"></a>biz_month <span class="ot">&lt;-</span> business_sf <span class="sc">|&gt;</span></span>
+<span id="cb49-40"><a href="#cb49-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(uen_issue_date, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb49-41"><a href="#cb49-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(month))</span>
+<span id="cb49-42"><a href="#cb49-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-43"><a href="#cb49-43" aria-hidden="true" tabindex="-1"></a>make_monthly_kde <span class="ot">&lt;-</span> <span class="cf">function</span>(sf_month) {</span>
+<span id="cb49-44"><a href="#cb49-44" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(sf_month) <span class="sc">&lt;</span> <span class="dv">5</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb49-45"><a href="#cb49-45" aria-hidden="true" tabindex="-1"></a>  ppp  <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">as.ppp</span>(sf_month)[sg_owin]</span>
+<span id="cb49-46"><a href="#cb49-46" aria-hidden="true" tabindex="-1"></a>  pppk <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">rescale.ppp</span>(ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb49-47"><a href="#cb49-47" aria-hidden="true" tabindex="-1"></a>  bw   <span class="ot">&lt;-</span> spatstat.explore<span class="sc">::</span><span class="fu">bw.ppl</span>(pppk)</span>
+<span id="cb49-48"><a href="#cb49-48" aria-hidden="true" tabindex="-1"></a>  im   <span class="ot">&lt;-</span> spatstat.explore<span class="sc">::</span><span class="fu">density.ppp</span>(pppk, <span class="at">sigma =</span> bw, <span class="at">edge =</span> <span class="cn">TRUE</span>, <span class="at">kernel =</span> <span class="st">"gaussian"</span>)</span>
+<span id="cb49-49"><a href="#cb49-49" aria-hidden="true" tabindex="-1"></a>  r    <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(im); terra<span class="sc">::</span><span class="fu">crs</span>(r) <span class="ot">&lt;-</span> <span class="st">"EPSG:3414"</span></span>
+<span id="cb49-50"><a href="#cb49-50" aria-hidden="true" tabindex="-1"></a>  r</span>
+<span id="cb49-51"><a href="#cb49-51" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb49-52"><a href="#cb49-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-53"><a href="#cb49-53" aria-hidden="true" tabindex="-1"></a>kde_monthly <span class="ot">&lt;-</span> biz_month <span class="sc">|&gt;</span></span>
+<span id="cb49-54"><a href="#cb49-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_split</span>(month) <span class="sc">|&gt;</span></span>
+<span id="cb49-55"><a href="#cb49-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(biz_month <span class="sc">|&gt;</span> <span class="fu">distinct</span>(month) <span class="sc">|&gt;</span> <span class="fu">pull</span>(month)) <span class="sc">|&gt;</span></span>
+<span id="cb49-56"><a href="#cb49-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map</span>(make_monthly_kde)</span>
+<span id="cb49-57"><a href="#cb49-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-58"><a href="#cb49-58" aria-hidden="true" tabindex="-1"></a><span class="co"># 6) (Optional) Quick maps</span></span>
+<span id="cb49-59"><a href="#cb49-59" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KDE of all businesses</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(kde_all_rast) <span class="sc">+</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_raster</span>(<span class="at">col.scale =</span> <span class="fu">tm_scale_continuous</span>(<span class="at">values =</span> <span class="st">"viridis"</span>),</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"KDE (per km²)"</span>)) <span class="sc">+</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>() <span class="sc">+</span> <span class="fu">tm_scalebar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KDE by SSIC (only plotted if not NULL)</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(kde_472)) {</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(kde_472) <span class="sc">+</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_raster</span>(<span class="at">col.scale =</span> <span class="fu">tm_scale_continuous</span>(<span class="at">values =</span> <span class="st">"magma"</span>),</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"KDE 472 (per km²)"</span>))</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-22-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(kde_474)) {</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(kde_474) <span class="sc">+</span></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_raster</span>(<span class="at">col.scale =</span> <span class="fu">tm_scale_continuous</span>(<span class="at">values =</span> <span class="st">"plasma"</span>),</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"KDE 474 (per km²)"</span>))</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-22-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(kde_475)) {</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(kde_475) <span class="sc">+</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_raster</span>(<span class="at">col.scale =</span> <span class="fu">tm_scale_continuous</span>(<span class="at">values =</span> <span class="st">"inferno"</span>),</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"KDE 475 (per km²)"</span>))</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[plot mode] fit legend/component: Some legend items or map compoments do not
+fit well, and are therefore rescaled.
+ℹ Set the tmap option `component.autoscale = FALSE` to disable rescaling.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-22-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Example: plot first available monthly KDE</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>ex_month <span class="ot">&lt;-</span> <span class="fu">names</span>(kde_monthly)[<span class="fu">which</span>(<span class="sc">!</span><span class="fu">vapply</span>(kde_monthly, is.null, <span class="cn">TRUE</span>))][<span class="dv">1</span>]</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(ex_month)) {</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(kde_monthly[[ex_month]]) <span class="sc">+</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_raster</span>(<span class="at">col.scale =</span> <span class="fu">tm_scale_continuous</span>(<span class="at">values =</span> <span class="st">"viridis"</span>),</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">col.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"KDE"</span>, ex_month, <span class="st">"(per km²)"</span>)))</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-22-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k" class="level1">
+<h1>6. Second-Order Spatial &amp; Spatio-Temporal Analysis (G/F/K/L &amp; Monthly K)</h1>
+<p><br>
+Second-order functions examine <em>interaction between points</em> across distances:</p>
+<ul>
+<li><p>G(r) nearest-neighbour distribution (point-to-nearest-point).</p></li>
+<li><p>F(r) empty-space distribution (random location to nearest point).</p></li>
+<li><p>K(r) expected points within distance r (global clustering/dispersion).</p></li>
+<li><p>L(r) = sqrt(K/π) variance-stabilised K.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatstat.geom)</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatstat.explore)</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">exists</span>(<span class="st">"mpsz"</span>)) {</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>  mpsz <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(<span class="st">"Data/MasterPlan2019SubzoneBoundaryNoSeaKML (1).kml"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">st_zm</span>(<span class="at">drop =</span> <span class="cn">TRUE</span>, <span class="at">what =</span> <span class="st">"ZM"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">st_transform</span>(<span class="dv">3414</span>)</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>mpsz_union <span class="ot">&lt;-</span> mpsz <span class="sc">|&gt;</span></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_make_valid</span>() <span class="sc">|&gt;</span></span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_union</span>()</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ensure EPSG:3414</span></span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">st_is_longlat</span>(mpsz_union) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">st_crs</span>(mpsz_union)) <span class="sc">&amp;&amp;</span> <span class="fu">st_crs</span>(mpsz_union)<span class="sc">$</span>epsg <span class="sc">!=</span> <span class="dv">3414</span>) {</span>
+<span id="cb57-23"><a href="#cb57-23" aria-hidden="true" tabindex="-1"></a>  mpsz_union <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(mpsz_union, <span class="dv">3414</span>)</span>
+<span id="cb57-24"><a href="#cb57-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-25"><a href="#cb57-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-26"><a href="#cb57-26" aria-hidden="true" tabindex="-1"></a>win <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(mpsz_union)</span>
+<span id="cb57-27"><a href="#cb57-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-28"><a href="#cb57-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-29"><a href="#cb57-29" aria-hidden="true" tabindex="-1"></a>sf_to_ppp_km <span class="ot">&lt;-</span> <span class="cf">function</span>(pts_sf, win) {</span>
+<span id="cb57-30"><a href="#cb57-30" aria-hidden="true" tabindex="-1"></a>  pts_sf <span class="ot">&lt;-</span> pts_sf <span class="sc">|&gt;</span> <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span> <span class="fu">cbind</span>(<span class="fu">st_coordinates</span>(<span class="fu">st_geometry</span>(pts_sf)))</span>
+<span id="cb57-31"><a href="#cb57-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">all</span>(<span class="fu">c</span>(<span class="st">"X"</span>,<span class="st">"Y"</span>) <span class="sc">%in%</span> <span class="fu">names</span>(pts_sf)))</span>
+<span id="cb57-32"><a href="#cb57-32" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> pts_sf<span class="sc">$</span>X; Y <span class="ot">&lt;-</span> pts_sf<span class="sc">$</span>Y</span>
+<span id="cb57-33"><a href="#cb57-33" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> spatstat.geom<span class="sc">::</span><span class="fu">ppp</span>(<span class="at">x =</span> X, <span class="at">y =</span> Y, <span class="at">window =</span> win, <span class="at">checkdup =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb57-34"><a href="#cb57-34" aria-hidden="true" tabindex="-1"></a>  spatstat.geom<span class="sc">::</span><span class="fu">rescale.ppp</span>(p, <span class="dv">1000</span>, <span class="st">"km"</span>) <span class="co"># metres -&gt; kilometres</span></span>
+<span id="cb57-35"><a href="#cb57-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-36"><a href="#cb57-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-37"><a href="#cb57-37" aria-hidden="true" tabindex="-1"></a>sppa_curves <span class="ot">&lt;-</span> <span class="cf">function</span>(ppp_obj, <span class="at">r_max =</span> <span class="dv">2</span>, <span class="at">step =</span> <span class="fl">0.05</span>) {</span>
+<span id="cb57-38"><a href="#cb57-38" aria-hidden="true" tabindex="-1"></a>  rseq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, r_max, <span class="at">by =</span> step)</span>
+<span id="cb57-39"><a href="#cb57-39" aria-hidden="true" tabindex="-1"></a>  G <span class="ot">&lt;-</span> <span class="fu">Gest</span>(ppp_obj, <span class="at">r =</span> rseq, <span class="at">correction =</span> <span class="st">"rs"</span>)      <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">transmute</span>(<span class="at">stat =</span> <span class="st">"G"</span>, r, <span class="at">est =</span> rs)</span>
+<span id="cb57-40"><a href="#cb57-40" aria-hidden="true" tabindex="-1"></a>  F <span class="ot">&lt;-</span> <span class="fu">Fest</span>(ppp_obj, <span class="at">r =</span> rseq, <span class="at">correction =</span> <span class="st">"rs"</span>)      <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">transmute</span>(<span class="at">stat =</span> <span class="st">"F"</span>, r, <span class="at">est =</span> rs)</span>
+<span id="cb57-41"><a href="#cb57-41" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">&lt;-</span> <span class="fu">Kest</span>(ppp_obj, <span class="at">r =</span> rseq, <span class="at">correction =</span> <span class="st">"Ripley"</span>)  <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">transmute</span>(<span class="at">stat =</span> <span class="st">"K"</span>, r, <span class="at">est =</span> iso)</span>
+<span id="cb57-42"><a href="#cb57-42" aria-hidden="true" tabindex="-1"></a>  L <span class="ot">&lt;-</span> <span class="fu">Lest</span>(ppp_obj, <span class="at">r =</span> rseq, <span class="at">correction =</span> <span class="st">"Ripley"</span>)  <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span> <span class="fu">transmute</span>(<span class="at">stat =</span> <span class="st">"L"</span>, r, <span class="at">est =</span> iso)</span>
+<span id="cb57-43"><a href="#cb57-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(G, F, K, L)</span>
+<span id="cb57-44"><a href="#cb57-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb57-45"><a href="#cb57-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-46"><a href="#cb57-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-47"><a href="#cb57-47" aria-hidden="true" tabindex="-1"></a><span class="co"># 6a) OVERALL (all selected businesses together)</span></span>
+<span id="cb57-48"><a href="#cb57-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-49"><a href="#cb57-49" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">inherits</span>(business_sf, <span class="st">"sf"</span>))</span>
+<span id="cb57-50"><a href="#cb57-50" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">st_crs</span>(business_sf)<span class="sc">$</span>epsg <span class="sc">!=</span> <span class="dv">3414</span>) business_sf <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(business_sf, <span class="dv">3414</span>)</span>
+<span id="cb57-51"><a href="#cb57-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-52"><a href="#cb57-52" aria-hidden="true" tabindex="-1"></a>pp_all <span class="ot">&lt;-</span> <span class="fu">sf_to_ppp_km</span>(business_sf, win)</span>
+<span id="cb57-53"><a href="#cb57-53" aria-hidden="true" tabindex="-1"></a>curves_all <span class="ot">&lt;-</span> <span class="fu">sppa_curves</span>(pp_all, <span class="at">r_max =</span> <span class="dv">2</span>, <span class="at">step =</span> <span class="fl">0.05</span>)</span>
+<span id="cb57-54"><a href="#cb57-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-55"><a href="#cb57-55" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(curves_all, <span class="fu">aes</span>(r, est)) <span class="sc">+</span></span>
+<span id="cb57-56"><a href="#cb57-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb57-57"><a href="#cb57-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> stat, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb57-58"><a href="#cb57-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"2nd-order functions (overall)"</span>,</span>
+<span id="cb57-59"><a href="#cb57-59" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"distance (km)"</span>, <span class="at">y =</span> <span class="st">"estimate"</span>) <span class="sc">+</span></span>
+<span id="cb57-60"><a href="#cb57-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6b) BY SSIC (472 / 474 / 475) </span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>ssic_groups <span class="ot">&lt;-</span> <span class="fu">split</span>(</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(business_sf, <span class="sc">!</span><span class="fu">is.na</span>(ssic3)),</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">f =</span> <span class="fu">subset</span>(business_sf, <span class="sc">!</span><span class="fu">is.na</span>(ssic3))<span class="sc">$</span>ssic3,</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">drop =</span> <span class="cn">TRUE</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>curves_by_ssic <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">imap</span>(ssic_groups, <span class="cf">function</span>(sf_grp, ssic) {</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(sf_grp) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">NULL</span>)</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  pp <span class="ot">&lt;-</span> <span class="fu">sf_to_ppp_km</span>(sf_grp, win)</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sppa_curves</span>(pp, <span class="at">r_max =</span> <span class="dv">2</span>, <span class="at">step =</span> <span class="fl">0.05</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">ssic3 =</span> ssic)</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">list_rbind</span>()</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(curves_by_ssic, <span class="fu">aes</span>(r, est, <span class="at">colour =</span> ssic3)) <span class="sc">+</span></span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> stat, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_brewer</span>(<span class="at">palette =</span> <span class="st">"Dark2"</span>) <span class="sc">+</span></span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"2nd-order functions by SSIC"</span>,</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"distance (km)"</span>, <span class="at">y =</span> <span class="st">"estimate"</span>, <span class="at">colour =</span> <span class="st">"SSIC"</span>) <span class="sc">+</span></span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-23-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 6c) SIMPLE SPATIO-TEMPORAL: K(r) BY MONTH (Jan-2024 .. Jun-2025)</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     (minimal: observed K only; no envelopes/MC)</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>biz_month <span class="ot">&lt;-</span> business_sf <span class="sc">|&gt;</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">floor_date</span>(uen_issue_date, <span class="st">"month"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(month <span class="sc">&gt;=</span> <span class="fu">ymd</span>(<span class="st">"2024-01-01"</span>), month <span class="sc">&lt;=</span> <span class="fu">ymd</span>(<span class="st">"2025-06-01"</span>))</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>months_ok <span class="ot">&lt;-</span> biz_month <span class="sc">|&gt;</span></span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">|&gt;</span></span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(month) <span class="sc">|&gt;</span></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;=</span> <span class="dv">30</span>) <span class="sc">|&gt;</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(month)</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a>k_month <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(months_ok, <span class="cf">function</span>(mo) {</span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a>  sf_grp <span class="ot">&lt;-</span> biz_month <span class="sc">|&gt;</span> <span class="fu">filter</span>(month <span class="sc">==</span> mo)</span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a>  pp <span class="ot">&lt;-</span> <span class="fu">sf_to_ppp_km</span>(sf_grp, win)</span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>  rseq <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="at">by =</span> <span class="fl">0.05</span>)</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">&lt;-</span> <span class="fu">Kest</span>(pp, <span class="at">r =</span> rseq, <span class="at">correction =</span> <span class="st">"Ripley"</span>) <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">month =</span> <span class="fu">format</span>(mo, <span class="st">"%Y-%m"</span>), <span class="at">r =</span> K<span class="sc">$</span>r, <span class="at">K =</span> K<span class="sc">$</span>iso)</span>
+<span id="cb59-21"><a href="#cb59-21" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb59-22"><a href="#cb59-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(k_month, <span class="fu">aes</span>(r, K, <span class="at">colour =</span> month, <span class="at">group =</span> month)) <span class="sc">+</span></span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Spatio-temporal K(r) by month (observed)"</span>,</span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"distance (km)"</span>, <span class="at">y =</span> <span class="st">"K(r)"</span>, <span class="at">colour =</span> <span class="st">"Month"</span>) <span class="sc">+</span></span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take_home_Ex01_files/figure-html/unnamed-chunk-23-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The analyses give a multi-scale view of retail formation. First, KDE maps show where activity happens without being bound by administrative boundaries. This is useful for town-centre improvement, station-area planning and gaps in everyday retail. For example high 472 near dense estates shows the importance of walkable, mixed-use centres; planners can protect ground-floor frontages and human-scale streets where concentrations are sustainable. Low intensities in green belts and industrial areas reflect land-use intent rather than unmet need, avoiding false signals.</p>
+<p>Second, type-specific KDEs show different retail categories go to different urban morphologies: daily-necessity (472) clusters in neighbourhood hubs; ICT (474) anchors in regional malls/transport nodes; household goods (475) follow larger floorplate corridors. This can inform tenant mix, zoning flexibility and logistics/parking provisions. For example ICT and household goods may benefit from transit adjacency and consolidated loading, while 472 needs fine-grain street networks and pedestrian priority.</p>
+<p>Third, second-order stats (G/F/K/L) show short-range clustering is robust and consistent with agglomeration economies (shared footfall, complementary offers, brand variety). Recognising these natural scales helps calibrate allowable frontage lengths, plot amalgamation rules and capex for place-making (e.g.&nbsp;shaded arcades, seating, micro-squares) that support cluster health. Policymakers can encourage temporal spread (e.g.&nbsp;evening economy) to maximise centre vitality without over-concentration.</p>
+<p>Finally the spatio-temporal view suggests incremental growth rather than sudden relocations. This stability supports phased improvements (streetscape, wayfinding, cycling access) and targeted grants to strengthen fragile centres. Where demand is thin, tactical urbanism (pop-ups/markets) can test viability before committing permanent space. Overall, combining KDE with second-order diagnostics gives a practical evidence base for retail-centre hierarchy planning, land-use safeguarding and investment prioritisation that aligns with accessibility and liveability.</p>
 
 
 </section>
