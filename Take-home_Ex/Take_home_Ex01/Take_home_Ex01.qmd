@@ -3,6 +3,14 @@ title: "Take Home exercise 1"
 author: "Chandru"
 ---
 
+# **1 Overview**
+
+New business formation shapes how cities live and function. Where retail firms choose to open signals emerging consumer corridors, anchors neighbourhood vitality, and guides the placement of transport, public amenities, and supporting services. Among them, SSIC 472, 474, and 475—food & tobacco retail, ICT equipment retail, and household goods retail—are highly visible, footfall-driven sectors whose locations respond quickly to shifts in demand and accessibility.
+
+In Singapore’s dense, transit-oriented context, the geography of new retail since 2024 offers a clean read on post-pandemic recovery, neighbourhood commercialisation, and the pull of major centres versus heartland towns. Understanding these patterns can help planners and town managers calibrate land use, frontage activation, and support schemes, while helping businesses benchmark siting choices.
+
+This study analyses new entities from Jan 2024 to Jun 2025 filtered from ACRA and geocoded via OneMap into an sf point layer, mapped within the URA Master Plan 2019 Subzone (EPSG:3414) boundary. We apply first-order methods (spatial and monthly Kernel Density Estimation) to reveal hotspots and their evolution, and second-order point-pattern functions (G, F, K, L) to assess clustering or dispersion across spatial scales, both overall and by SSIC band (472/474/475). The outputs are cartographic hotspot maps and concise diagnostics intended to inform urban land-use planning, centre management, and retail support policy.
+
 # **2 Installing the required R packages**
 
 | Package | Description |
@@ -22,6 +30,8 @@ pacman::p_load(sf, spNetwork, spatstat, raster, tmap, tidyverse, classInt, gifsk
 
 # **3 The Data**
 
+## 3.1 Point to the ACRA folder and sanity-check the path
+
 ```{r}
 # from the project root
 # if _quarto.yml is in Take_home_Ex01/
@@ -36,6 +46,8 @@ list.files(data_dir)[1:5]     # quick peek
 
 ```
 
+## 3.2 List all CSVs and preview file names
+
 ```{r}
 library(readr)
 library(purrr)
@@ -48,6 +60,8 @@ files <- list.files("Data/ACRAInformationonCorporateEntities",
 length(files)        # how many files?
 head(basename(files))
 ```
+
+## 3.3 Stack all CSVs into one tibble
 
 ```{r}
 
@@ -64,7 +78,7 @@ acra_all <- files |>
 glimpse(acra_all)
 ```
 
-Filter out the required business entities
+## 3.4 Filter to retail SSIC 472/474/475
 
 ```{r}
 library(dplyr)
@@ -83,7 +97,7 @@ business <- acra_all %>%
 glimpse(business)
 ```
 
-adding the ssic code as a seperate column
+## 3.5 Add a 3-digit SSIC field and label it
 
 ```{r}
 business <- business %>%
@@ -93,8 +107,6 @@ business <- business %>%
 ```{r}
 business %>% count(ssic3, sort = TRUE)
 ```
-
-Keep a label for each SSIC band:
 
 ```{r}
 ssic_lookup <- tibble::tribble(
@@ -107,7 +119,7 @@ ssic_lookup <- tibble::tribble(
 business <- business %>% left_join(ssic_lookup, by = "ssic3")
 ```
 
-Extract the business entities registered between 1st January 2024 to 30th June 2025
+## 3.6 Time filter: keep entities issued from 2024-01-01 to 2025-06-30
 
 ```{r}
 library(lubridate)
@@ -130,6 +142,8 @@ head(business, n=5)
 
 names(business_recent)
 ```
+
+## 3.7 Keep only analysis fields and standardise dates/postal
 
 ```{r}
 library(dplyr)
@@ -166,7 +180,7 @@ business_clean %>%
 
 ```
 
-final cleaning
+## 3.8 Final address hygiene, dedupe by UEN, and build a full geocode string
 
 ```{r}
 library(dplyr)
@@ -198,6 +212,10 @@ business_ready <- business_clean %>%
 # quick sanity peek (shows all columns)
 business_ready %>% slice_head(n = 2) %>% print(width = Inf)
 ```
+
+# 4 Geocoding & Base Map
+
+## 4.1 Define a OneMap postal-code geocoder and run it
 
 ```{r}
 library(httr)
@@ -243,13 +261,10 @@ onemap_geocode_postal <- function(postal_codes) {
  
 ```
 
+## 4.2 Join coordinates, convert to sf (WGS84 → SVY21)
+
 ```{r}
-# OPTIONAL: left-pad postal codes to 6 digits if your data has things like "0718"
-# library(stringr)
-# business_ready <- business_ready %>%
-#   mutate(postal_code = ifelse(!is.na(postal_code),
-#                               str_pad(postal_code, 6, pad = "0"),
-#                               postal_code))
+
 
 pc_lookup <- onemap_geocode_postal(business_ready$postal_code)
 
@@ -267,6 +282,8 @@ business_sf <- business_geo %>%
 ```{r}
 plot(st_geometry(business_sf), pch = 16, cex = 0.3)
 ```
+
+## 4.3 Load URA subzones and plot a quick base map
 
 ```{r}
 library(sf)
@@ -526,6 +543,8 @@ ggplot(k_month, aes(r, K, colour = month, group = month)) +
   theme_minimal(base_size = 12)
 
 ```
+
+# 7 Discussion & Planning Use
 
 The analyses give a multi-scale view of retail formation. First, KDE maps show where activity happens without being bound by administrative boundaries. This is useful for town-centre improvement, station-area planning and gaps in everyday retail. For example high 472 near dense estates shows the importance of walkable, mixed-use centres; planners can protect ground-floor frontages and human-scale streets where concentrations are sustainable. Low intensities in green belts and industrial areas reflect land-use intent rather than unmet need, avoiding false signals.
 
