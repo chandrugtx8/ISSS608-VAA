@@ -43,7 +43,8 @@ global_moran_perm(wm_q$GDPPC,
                   nsim = 99)
 ```
 
-Local  Moran`s I
+Local Moran\`s I
+
 ```{r}
 
 
@@ -59,8 +60,8 @@ lisa <- wm_q %>%
 glimpse(lisa)
 ```
 
+## Visualising Lisa map
 
-## Visualising Lisa map 
 ```{r}
 lisa <- lisa %>%
   mutate(
@@ -96,4 +97,3 @@ lisa_map <- tm_shape(lisa) +
   tm_title("Local Moran's I Clusters (p < 0.05)")
 lisa_map
 ```
-
