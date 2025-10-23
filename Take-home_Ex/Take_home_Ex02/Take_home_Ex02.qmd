@@ -1,0 +1,474 @@
+---
+title: "Take home exercise 2"
+author: "Chandru"
+---
+
+# 1 Overview
+
+Urban mobility analysis can reveal how travel demand concentrates and evolves across space and time. In this study, we use LTA DataMall “Passenger Volume by Origin–Destination (Bus Stops)” to examine where origins generate more trips and how local clustering changes through time. We:
+
+-   Build a 375 m apothem hexagon grid as traffic analysis zones (TAZ).
+-   Aggregate origin trips for three policy windows:
+    -   Weekday AM peak (06:00–09:00),
+    -   Weekday PM peak (17:00–20:00),
+    -   Weekend/holiday (11:00–20:00).
+-   Run Local Measures of Spatial Autocorrelation (LMSA): Local Moran’s I (hot/cold + outliers) and Getis-Ord Gi\* (hot/cold).
+-   Run a lightweight Emerging Hot Spot Analysis (EHSA) by computing Gi\* per time slice and testing temporal trends using Mann–Kendall.
+
+Outputs include clean geovisualisations and short, decision-oriented summaries to support service planning and hotspot monitoring.
+
+# 2 Packages
+
+```{r}
+pacman::p_load(
+  # core wrangling
+  tidyverse, lubridate, readr, janitor,
+  # spatial
+  sf, sfheaders, tmap, terra,
+  # spatial stats
+  sfdep, spdep,
+  # trend test
+  Kendall
+)
+```
+
+# 3 Data
+
+```{r}
+
+# sanity checks (optional, but helps)
+getwd()
+file.exists("Data/Geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+
+```{r}
+library(sf)
+mpsz <- st_read("Data/Geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
+  st_zm(drop = TRUE, what = "ZM") |>
+  st_transform(3414) |>
+  st_make_valid()
+
+```
+
+```{r}
+bus_stops <- st_read("Data/Geospatial/BusStopLocation_Aug2025/BusStop.shp") |>
+  st_transform(3414) |>
+  st_make_valid()
+
+```
+
+```{r}
+# --- OD passenger volumes (CSV) ---
+library(readr); library(janitor); library(dplyr)
+
+od_file <- "Data/Apstial/origin_destination_bus_202508.csv"  # folder name is 'Apstial'
+stopifnot(file.exists(od_file))
+
+od <- read_csv(
+  od_file,
+  show_col_types = FALSE,
+  guess_max = 1e6,
+  progress = FALSE
+) |>
+  clean_names()
+
+glimpse(od)
+
+```
+
+# 4) Build hex TAZ & aggregate trips
+
+Created a 375 m-apothem hexagon grid over the URA subzone boundary to serve as uniform Traffic Analysis Zones (TAZ). Assigned each origin bus stop to a hex and summed tap-ons at hex level for three windows: Weekday AM (06–09), Weekday PM (17–20), Weekend/Holiday (11–20). Produced an sf hex layer with one trips field per window, suitable for mapping and downstream statistics.
+
+```{r}
+library(dplyr)
+library(janitor)
+
+# 1) Normalise bus stop id column to `stop_code`
+bus_stops <- bus_stops %>%
+  clean_names()
+
+nm <- names(bus_stops)
+stop_col <- case_when(
+  "bus_stop_n"   %in% nm ~ "bus_stop_n",
+  "busstopcode"  %in% nm ~ "busstopcode",
+  "bus_stop"     %in% nm ~ "bus_stop",
+  "stop_code"    %in% nm ~ "stop_code",
+  TRUE ~ NA_character_
+)
+stopifnot(!is.na(stop_col))
+
+bus_stops <- bus_stops %>%
+  rename(stop_code = all_of(stop_col)) %>%
+  mutate(stop_code = as.character(stop_code))
+
+# 2) Ensure OD keys are character too
+od <- od %>%
+  clean_names() %>%
+  mutate(
+    origin_pt_code      = as.character(origin_pt_code),
+    destination_pt_code = as.character(destination_pt_code)
+  )
+
+
+```
+
+
+
+
+
+
+
+
+```{r}
+
+names(bus_stops)  # should include "stop_code"
+names(od)         # should include "origin_pt_code","day_type","time_per_hour","total_trips"
+```
+
+```{r}
+
+library(dplyr)
+
+# keep only what we need from OD and align the join key to "stop_code"
+od_min <- od %>%
+  transmute(
+    stop_code   = as.character(origin_pt_code),
+    year_month, day_type, time_per_hour, total_trips
+  )
+
+# join attributes onto the bus_stop geometries (origin locations)
+od_pts <- bus_stops %>%
+  mutate(stop_code = as.character(stop_code)) %>%
+  inner_join(od_min, by = "stop_code")
+
+# quick sanity
+nrow(od_pts)
+head(st_drop_geometry(od_pts))
+
+```
+
+
+
+```{r}
+library(dplyr)
+library(sf)
+
+# ---- Hex grid (375 m apothem) ----
+apothem <- 375
+cell_x  <- 2 * apothem
+cell_y  <- sqrt(3) * apothem
+
+hex0 <- st_make_grid(
+  mpsz,
+  what     = "polygons",
+  square   = FALSE,
+  cellsize = c(cell_x, cell_y)
+)
+
+hex <- st_sf(hex_id = seq_along(hex0), geometry = hex0) |>
+  st_make_valid() |>
+  st_intersection(st_union(mpsz)) |>
+  st_make_valid()
+
+# ---- Tag each origin point with hex_id (keep separate object) ----
+od_pts_hex <- st_join(od_pts, hex |> dplyr::select(hex_id), left = FALSE)
+
+# ---- Aggregate trips for the three policy windows (across all months) ----
+is_wk_am <- function(x_day, x_hr)  x_day == "WEEKDAY"          & x_hr %in% 6:9
+is_wk_pm <- function(x_day, x_hr)  x_day == "WEEKDAY"          & x_hr %in% 17:20
+is_wknd  <- function(x_day, x_hr)  x_day == "WEEKENDS/HOLIDAY" & x_hr %in% 11:20
+
+agg_df <- od_pts_hex |>
+  st_drop_geometry() |>
+  group_by(hex_id) |>
+  summarise(
+    trips_am = sum(total_trips[ is_wk_am(day_type, time_per_hour) ], na.rm = TRUE),
+    trips_pm = sum(total_trips[ is_wk_pm(day_type, time_per_hour) ], na.rm = TRUE),
+    trips_we = sum(total_trips[ is_wknd(day_type, time_per_hour) ], na.rm = TRUE),
+    .groups = "drop"
+  )
+
+hex <- hex |>
+  left_join(agg_df, by = "hex_id") |>
+  mutate(across(starts_with("trips_"), \(v) tidyr::replace_na(v, 0)))
+
+```
+
+
+```{r}
+library(tmap)
+tmap_mode("plot")
+
+tm_shape(hex) + 
+  tm_polygons("trips_am", palette = "YlOrRd", title = "AM peak trips") +
+tm_layout(frame = FALSE)
+```
+
+#5) LMSA (Local Moran’s I, Local Geary’s C, Getis-Ord Gi*)
+
+Built queen-contiguity neighbours on the hex TAZ and row-standardised spatial weights. For each window (AM, PM, Weekend), computed three local statistics: (i) Local Moran’s I to identify hot/cold clusters and spatial outliers, (ii) Local Geary’s C to flag local dissimilarity, and (iii) Getis-Ord Gi* to locate high/low concentration without relying on global mean/variance. Results retain each statistic, a two-sided p-value (permutation for Moran/Geary; z-based for Gi*), and a significance mask (p < 0.05). For Moran, also derived HH/LL/HL/LH quadrant labels (mean-centered) for quick mapping.
+
+
+```{r}
+
+# --- 5) Local Measures of Spatial Autocorrelation (LMSA) ---
+# Needs: hex (sf polygons) with trips_am, trips_pm, trips_we
+
+library(dplyr)
+library(sf)
+library(spdep)
+
+# small helper for "a %||% b"
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+
+# 5.1 neighbours (queen) & row-standardised weights
+nb_q <- spdep::poly2nb(hex, queen = TRUE, row.names = hex$hex_id)
+lw_q <- spdep::nb2listw(nb_q, style = "W", zero.policy = TRUE)  # row-standardised
+
+# 5.2 function to run Gi* + Local Moran’s I for one numeric field
+run_lmsa <- function(hex, value_col, lw_q, nsim = 199) {
+  x <- hex[[value_col]]
+
+  # z-score and spatial lag of z
+  z    <- as.numeric(scale(x))
+  lagz <- spdep::lag.listw(lw_q, z, zero.policy = TRUE)
+
+  # --- Local Moran’s I ---
+  if ("localmoran_perm" %in% getNamespaceExports("spdep")) {
+    mor <- spdep::localmoran_perm(x, lw_q, nsim = nsim, zero.policy = TRUE)
+    Ii  <- mor[, 1]
+    p_I <- mor[, 5]
+  } else {
+    mor <- spdep::localmoran(x, lw_q, zero.policy = TRUE)
+    Ii  <- mor[, 1]
+    p_I <- mor[, 5]
+  }
+
+  # quadrant for Moran scatterplot (not significance-filtered)
+  quad <- dplyr::case_when(
+    z >= 0 & lagz >= 0 ~ "HH",
+    z <= 0 & lagz <= 0 ~ "LL",
+    z >= 0 & lagz <= 0 ~ "HL",
+    z <= 0 & lagz >= 0 ~ "LH",
+    TRUE               ~ NA_character_
+  )
+
+  # --- Getis–Ord Gi* ---
+  if ("localG_perm" %in% getNamespaceExports("spdep")) {
+    Gi <- spdep::localG_perm(x, lw_q, nsim = nsim, zero.policy = TRUE)
+    Gi <- as.numeric(Gi)
+    # some builds attach p-values as attributes; if not, fall back to normal approx
+    p_G <- attr(Gi, "p.values") %||% attr(Gi, "p.values.two.sided") %||% (2 * pnorm(-abs(Gi)))
+  } else {
+    Gi <- as.numeric(spdep::localG(x, lw_q, zero.policy = TRUE))
+    p_G <- 2 * pnorm(-abs(Gi))
+  }
+
+  # assemble tidy columns
+  tibble::tibble(
+    !!paste0(value_col, "_I")       := Ii,
+    !!paste0(value_col, "_I_p")     := p_I,
+    !!paste0(value_col, "_I_quad")  := quad,
+    !!paste0(value_col, "_I_sig")   := p_I < 0.05,
+    !!paste0(value_col, "_Gi")      := Gi,
+    !!paste0(value_col, "_Gi_p")    := p_G,
+    !!paste0(value_col, "_Gi_sig")  := p_G < 0.05
+  )
+}
+
+# 5.3 Run LMSA for the three windows -> one sf with all results
+hex_lmsa <- dplyr::bind_cols(
+  hex,
+  run_lmsa(hex, "trips_am", lw_q, nsim = 199),
+  run_lmsa(hex, "trips_pm", lw_q, nsim = 199),
+  run_lmsa(hex, "trips_we", lw_q, nsim = 199)
+)
+
+# 5.4 Quick significance counts (optional sanity)
+summ_counts <- function(g, v) {
+  tibble::tibble(
+    window  = v,
+    n_hotGi  = sum(g[[paste0(v, "_Gi_sig")]] & g[[paste0(v, "_Gi")]]  > 0, na.rm = TRUE),
+    n_coldGi = sum(g[[paste0(v, "_Gi_sig")]] & g[[paste0(v, "_Gi")]]  < 0, na.rm = TRUE),
+    n_HH     = sum(g[[paste0(v, "_I_sig")]] & g[[paste0(v, "_I_quad")]] == "HH", na.rm = TRUE),
+    n_LL     = sum(g[[paste0(v, "_I_sig")]] & g[[paste0(v, "_I_quad")]] == "LL", na.rm = TRUE),
+    n_HL     = sum(g[[paste0(v, "_I_sig")]] & g[[paste0(v, "_I_quad")]] == "HL", na.rm = TRUE),
+    n_LH     = sum(g[[paste0(v, "_I_sig")]] & g[[paste0(v, "_I_quad")]] == "LH", na.rm = TRUE)
+  )
+}
+sig_summary <- dplyr::bind_rows(
+  summ_counts(hex_lmsa, "trips_am"),
+  summ_counts(hex_lmsa, "trips_pm"),
+  summ_counts(hex_lmsa, "trips_we")
+)
+sig_summary
+
+
+```
+
+
+```{r}
+
+
+library(tmap)
+tmap_mode("plot")  # or "view"
+
+tm_shape(hex_lmsa) +
+  tm_polygons("trips_am_Gi",
+              style = "fisher",
+              palette = "RdBu",
+              midpoint = 0,
+              title = "Gi* (AM)") +
+  tm_borders(col = "grey40")
+```
+
+#6) Built a monthly space–time view of trip intensity by aggregating origin tap-ons per hexagon for each policy window (AM, PM, weekend/holiday). For every month we computed local Getis–Ord Gi* to obtain a z-score surface of hot/cold clustering. For each hex we then applied a Mann–Kendall trend test across the monthly Gi* sequence and assigned an EHSA label: “new”, “intensifying”, “persistent”, “diminishing”, or “sporadic” hot/cold, otherwise “no pattern.” The result identifies where demand clusters are strengthening, weakening, or newly emerging, giving operators a time-aware basis for targeted service adjustments and monitoring.
+
+```{r}
+# --- 6) EHSA-style trend on monthly Gi* ------------------------------
+
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(spdep)
+library(Kendall)
+library(tmap)
+
+# Safety: if you didn’t keep lw_q from §5, rebuild here
+if (!exists("lw_q")) {
+  nb_q <- sfdep::st_contiguity(hex)                    # queen contiguity neighbours
+  lw_q <- sfdep::st_weights(nb_q, allow_zero = TRUE)   # keep islands
+}
+
+# 6.1 Window helpers (same logic as §4)
+is_wk_am <- function(x_day, x_hr)  x_day == "WEEKDAY"          & x_hr %in% 6:9
+is_wk_pm <- function(x_day, x_hr)  x_day == "WEEKDAY"          & x_hr %in% 17:20
+is_wknd  <- function(x_day, x_hr)  x_day == "WEEKENDS/HOLIDAY" & x_hr %in% 11:20
+
+# 6.2 Build monthly-wide table for any window
+agg_monthly <- function(od_pts_sf, hex_sf, is_window_fn) {
+  # aggregate trips by hex_id x year_month and widen
+  trips_wide <- od_pts_sf %>%
+    filter(is_window_fn(day_type, time_per_hour)) %>%
+    st_drop_geometry() %>%
+    count(hex_id, year_month, wt = total_trips, name = "trips") %>%
+    pivot_wider(names_from = year_month, values_from = trips, values_fill = 0)
+
+  # make a plain tibble of all hex IDs to guarantee a 1:1 canvas
+  hex_index <- hex_sf %>% st_drop_geometry() %>% as_tibble() %>% select(hex_id)
+
+  # left join so hexes with no trips still appear with zeros
+  wide_on_index <- hex_index %>%
+    left_join(trips_wide, by = "hex_id") %>%
+    arrange(hex_id)
+
+  # return as sf by joining geometry back
+  hex_sf %>% left_join(wide_on_index, by = "hex_id")
+}
+
+# 6.3 Compute monthly Gi* time series (localG returns z-scores)
+localGi_over_time <- function(sf_wide, lw, month_cols) {
+  gi_mat <- map_dfc(month_cols, function(m) {
+    x <- sf_wide[[m]]
+    # guard against NAs that would stop spdep::localG
+    x[is.na(x)] <- 0
+    z <- spdep::localG(x, lw)           # vector of z-scores
+    tibble(!!paste0("gi_", m) := as.numeric(z))
+  })
+  bind_cols(sf_wide %>% select(hex_id), gi_mat) %>% 
+    st_as_sf(sf_wide %>% st_geometry())
+}
+
+# 6.4 A very light EHSA labeller:
+#     MK trend on |Gi*| (strength) + a “new hot/cold” for last-month z>=1.96
+label_each_hex <- function(gi_sf, month_cols) {
+  gi_cols <- paste0("gi_", month_cols)
+  last_col <- gi_cols[length(gi_cols)]
+
+  # MK trend on absolute Gi* (strength increases or decreases)
+  mk <- apply(st_drop_geometry(gi_sf)[, gi_cols, drop = FALSE], 1, function(v) {
+    v[is.na(v)] <- 0
+    Kendall::MannKendall(abs(v))
+  })
+
+  tau  <- sapply(mk, `[[`, "tau")
+  pval <- sapply(mk, `[[`, "sl")
+
+  # basic significance & direction
+  trend <- case_when(
+    pval < 0.05 & tau >  0  ~ "Intensifying",
+    pval < 0.05 & tau <  0  ~ "Diminishing",
+    TRUE                    ~ "No trend"
+  )
+
+  last_z <- gi_sf[[last_col]]
+
+  # “new hot/cold” if last month significant (|z|≥1.96) and previous months were weak
+  prev_max <- apply(st_drop_geometry(gi_sf)[, gi_cols[-length(gi_cols)], drop = FALSE],
+                    1, function(v) max(abs(replace(v, is.na(v), 0))))
+  new_flag <- abs(last_z) >= 1.96 & prev_max < 1.96
+
+  ehsa <- case_when(
+    new_flag & last_z >= 1.96  ~ "New Hot",
+    new_flag & last_z <= -1.96 ~ "New Cold",
+    trend == "Intensifying" & last_z >= 1.96  ~ "Intensifying Hot",
+    trend == "Intensifying" & last_z <= -1.96 ~ "Intensifying Cold",
+    trend == "Diminishing"  & last_z >= 1.96  ~ "Diminishing Hot",
+    trend == "Diminishing"  & last_z <= -1.96 ~ "Diminishing Cold",
+    TRUE                                      ~ "No Pattern"
+  )
+
+  gi_sf %>%
+    mutate(ehsa = ehsa)
+}
+
+# 6.5 Build monthly wide tables for AM/PM/WE
+am_wide <- agg_monthly(od_pts, hex, is_wk_am)
+pm_wide <- agg_monthly(od_pts, hex, is_wk_pm)
+we_wide <- agg_monthly(od_pts, hex, is_wknd)
+
+# identify the month columns (everything except id/geometry)
+am_month_cols <- setdiff(names(am_wide), c("hex_id", "geometry"))
+pm_month_cols <- setdiff(names(pm_wide), c("hex_id", "geometry"))
+we_month_cols <- setdiff(names(we_wide), c("hex_id", "geometry"))
+
+# quick sanity – how many months per window?
+sapply(list(AM = am_month_cols, PM = pm_month_cols, WE = we_month_cols), length)
+
+# 6.6 Gi* time series & EHSA-style labels
+am_gi  <- localGi_over_time(am_wide, lw_q, am_month_cols)
+pm_gi  <- localGi_over_time(pm_wide, lw_q, pm_month_cols)
+we_gi  <- localGi_over_time(we_wide, lw_q, we_month_cols)
+
+ehsa_am <- label_each_hex(am_gi, am_month_cols)
+ehsa_pm <- label_each_hex(pm_gi, pm_month_cols)
+ehsa_we <- label_each_hex(we_gi, we_month_cols)
+
+# 6.7 Small QC tables (should not be all “Insufficient” anymore)
+table_AM <- sort(table(ehsa_am$ehsa), decreasing = TRUE)
+table_PM <- sort(table(ehsa_pm$ehsa), decreasing = TRUE)
+table_WE <- sort(table(ehsa_we$ehsa), decreasing = TRUE)
+table_AM; table_PM; table_WE
+
+# 6.8 Plot (static) – set component.autoscale = FALSE to prevent legend shrink
+tmap_mode("plot"); tmap_options(component.autoscale = FALSE)
+
+tm1 <- tm_shape(ehsa_am) + tm_polygons("ehsa", title = "EHSA (AM)")
+tm2 <- tm_shape(ehsa_pm) + tm_polygons("ehsa", title = "EHSA (PM)")
+tm3 <- tm_shape(ehsa_we) + tm_polygons("ehsa", title = "EHSA (WE)")
+tm1
+tm2
+tm3
+
+
+```
+
+
+
+
+
+
+
+
+
