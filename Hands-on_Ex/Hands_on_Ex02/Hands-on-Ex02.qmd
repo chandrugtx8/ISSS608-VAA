@@ -21,8 +21,6 @@ Among the five packages, readr, tidyr and dplyr are part of tidyverse package.
 
 The code chunk below will be used to install and load these packages in RStudio.
 
-
-
 ```{r}
 pacman::p_load(sf, tmap, tidyverse, rvest)
 ```
@@ -34,6 +32,7 @@ The code chunk below uses the st_read() function of sf package to import MP14_SU
 ```{r}
 mpsz <- st_read("Data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 ```
+
 Function to extract values from the HTML description
 
 ```{r}
@@ -80,12 +79,7 @@ popdata <- read_csv("Data/aspatial/respopagesextod2024.csv")
 
 Before a thematic map can be prepared, you are required to prepare a data table with year 2020 values. The data table should include the variables PA, SZ, YOUNG, ECONOMY ACTIVE, AGED, TOTAL, DEPENDENCY.
 
-YOUNG: age group 0 to 4 until age groyup 20 to 24,
-ECONOMY ACTIVE: age group 25-29 until age group 60-64,
-AGED: age group 65 and above,
-TOTAL: all age group, and
-DEPENDENCY: the ratio between young and aged against economy active group
-
+YOUNG: age group 0 to 4 until age groyup 20 to 24, ECONOMY ACTIVE: age group 25-29 until age group 60-64, AGED: age group 65 and above, TOTAL: all age group, and DEPENDENCY: the ratio between young and aged against economy active group
 
 Data Wrangling
 
@@ -110,6 +104,7 @@ mutate(`DEPENDENCY` = (`YOUNG` + `AGED`)
        `ECONOMY ACTIVE`, `AGED`, 
        `TOTAL`, `DEPENDENCY`)
 ```
+
 Joining the attribute data and geospatial data
 
 Before we can perform the georelational join, one extra step is required to convert the values in PA and SZ fields to uppercase. This is because the values of PA and SZ fields are made up of upper- and lowercase. On the other, hand the SUBZONE_N and PLN_AREA_N are in uppercase.
@@ -122,6 +117,7 @@ popdata2024 <- popdata2024 %>%
 ```
 
 Importing and Wrangling Geospatial Data Sets
+
 ```{r}
 mpsz_sf <- sf::st_read("../Hands_on_Ex02/Data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") |>
   sf::st_zm(drop = TRUE, what = "ZM") |>

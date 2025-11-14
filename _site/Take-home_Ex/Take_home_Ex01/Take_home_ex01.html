@@ -148,6 +148,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands-on_Ex/Hands_on_Ex08/Hands-on-Ex08.html">
  <span class="dropdown-text">Hands-on Exercise 8</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands_on_Ex09/Hands-on-Ex09.html">
+ <span class="dropdown-text">Hands-on Exercise 9</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands_on_Ex12/Hands-on-Ex12.html">
+ <span class="dropdown-text">Hands-on Exercise 12</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -167,6 +175,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex04.html">
  <span class="dropdown-text">In-class Excercise 4</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex05/In-class_Ex05.html">
+ <span class="dropdown-text">In-class Excercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex06/In-class_Ex06.html">
+ <span class="dropdown-text">In-class Excercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex07/In-class_Ex07.html">
+ <span class="dropdown-text">In-class Excercise 7</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -177,6 +197,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../Take-home_Ex/Take_home_Ex01/Take_home_Ex01.html">
  <span class="dropdown-text">Take Home Excercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take_home_Ex02/Take_home_Ex02.html">
+ <span class="dropdown-text">Take Home Excercise 2</span></a>
   </li>  
     </ul>
   </li>
@@ -206,10 +230,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installing-the-required-r-packages" id="toc-installing-the-required-r-packages" class="nav-link active" data-scroll-target="#installing-the-required-r-packages"><strong>2 Installing the required R packages</strong></a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><strong>3 The Data</strong></a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><strong>1 Overview</strong></a></li>
+  <li><a href="#installing-the-required-r-packages" id="toc-installing-the-required-r-packages" class="nav-link" data-scroll-target="#installing-the-required-r-packages"><strong>2 Installing the required R packages</strong></a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><strong>3 The Data</strong></a>
+  <ul class="collapse">
+  <li><a href="#point-to-the-acra-folder-and-sanity-check-the-path" id="toc-point-to-the-acra-folder-and-sanity-check-the-path" class="nav-link" data-scroll-target="#point-to-the-acra-folder-and-sanity-check-the-path">3.1 Point to the ACRA folder and sanity-check the path</a></li>
+  <li><a href="#list-all-csvs-and-preview-file-names" id="toc-list-all-csvs-and-preview-file-names" class="nav-link" data-scroll-target="#list-all-csvs-and-preview-file-names">3.2 List all CSVs and preview file names</a></li>
+  <li><a href="#stack-all-csvs-into-one-tibble" id="toc-stack-all-csvs-into-one-tibble" class="nav-link" data-scroll-target="#stack-all-csvs-into-one-tibble">3.3 Stack all CSVs into one tibble</a></li>
+  <li><a href="#filter-to-retail-ssic-472474475" id="toc-filter-to-retail-ssic-472474475" class="nav-link" data-scroll-target="#filter-to-retail-ssic-472474475">3.4 Filter to retail SSIC 472/474/475</a></li>
+  <li><a href="#add-a-3-digit-ssic-field-and-label-it" id="toc-add-a-3-digit-ssic-field-and-label-it" class="nav-link" data-scroll-target="#add-a-3-digit-ssic-field-and-label-it">3.5 Add a 3-digit SSIC field and label it</a></li>
+  <li><a href="#time-filter-keep-entities-issued-from-2024-01-01-to-2025-06-30" id="toc-time-filter-keep-entities-issued-from-2024-01-01-to-2025-06-30" class="nav-link" data-scroll-target="#time-filter-keep-entities-issued-from-2024-01-01-to-2025-06-30">3.6 Time filter: keep entities issued from 2024-01-01 to 2025-06-30</a></li>
+  <li><a href="#keep-only-analysis-fields-and-standardise-datespostal" id="toc-keep-only-analysis-fields-and-standardise-datespostal" class="nav-link" data-scroll-target="#keep-only-analysis-fields-and-standardise-datespostal">3.7 Keep only analysis fields and standardise dates/postal</a></li>
+  <li><a href="#final-address-hygiene-dedupe-by-uen-and-build-a-full-geocode-string" id="toc-final-address-hygiene-dedupe-by-uen-and-build-a-full-geocode-string" class="nav-link" data-scroll-target="#final-address-hygiene-dedupe-by-uen-and-build-a-full-geocode-string">3.8 Final address hygiene, dedupe by UEN, and build a full geocode string</a></li>
+  </ul></li>
+  <li><a href="#geocoding-base-map" id="toc-geocoding-base-map" class="nav-link" data-scroll-target="#geocoding-base-map">4 Geocoding &amp; Base Map</a>
+  <ul class="collapse">
+  <li><a href="#define-a-onemap-postal-code-geocoder-and-run-it" id="toc-define-a-onemap-postal-code-geocoder-and-run-it" class="nav-link" data-scroll-target="#define-a-onemap-postal-code-geocoder-and-run-it">4.1 Define a OneMap postal-code geocoder and run it</a></li>
+  <li><a href="#join-coordinates-convert-to-sf-wgs84-svy21" id="toc-join-coordinates-convert-to-sf-wgs84-svy21" class="nav-link" data-scroll-target="#join-coordinates-convert-to-sf-wgs84-svy21">4.2 Join coordinates, convert to sf (WGS84 → SVY21)</a></li>
+  <li><a href="#load-ura-subzones-and-plot-a-quick-base-map" id="toc-load-ura-subzones-and-plot-a-quick-base-map" class="nav-link" data-scroll-target="#load-ura-subzones-and-plot-a-quick-base-map">4.3 Load URA subzones and plot a quick base map</a></li>
+  </ul></li>
   <li><a href="#spatial-spatio-temporal-kernel-density-estimation-kde" id="toc-spatial-spatio-temporal-kernel-density-estimation-kde" class="nav-link" data-scroll-target="#spatial-spatio-temporal-kernel-density-estimation-kde">5. Spatial &amp; Spatio-Temporal Kernel Density Estimation (KDE)</a></li>
   <li><a href="#second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k" id="toc-second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k" class="nav-link" data-scroll-target="#second-order-spatial-spatio-temporal-analysis-gfkl-monthly-k">6. Second-Order Spatial &amp; Spatio-Temporal Analysis (G/F/K/L &amp; Monthly K)</a></li>
+  <li><a href="#discussion-planning-use" id="toc-discussion-planning-use" class="nav-link" data-scroll-target="#discussion-planning-use">7 Discussion &amp; Planning Use</a></li>
   </ul>
 </nav>
     </div>
@@ -241,6 +283,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="overview" class="level1">
+<h1><strong>1 Overview</strong></h1>
+<p>New business formation shapes how cities live and function. Where retail firms choose to open signals emerging consumer corridors, anchors neighbourhood vitality, and guides the placement of transport, public amenities, and supporting services. Among them, SSIC 472, 474, and 475—food &amp; tobacco retail, ICT equipment retail, and household goods retail—are highly visible, footfall-driven sectors whose locations respond quickly to shifts in demand and accessibility.</p>
+<p>In Singapore’s dense, transit-oriented context, the geography of new retail since 2024 offers a clean read on post-pandemic recovery, neighbourhood commercialisation, and the pull of major centres versus heartland towns. Understanding these patterns can help planners and town managers calibrate land use, frontage activation, and support schemes, while helping businesses benchmark siting choices.</p>
+<p>This study analyses new entities from Jan 2024 to Jun 2025 filtered from ACRA and geocoded via OneMap into an sf point layer, mapped within the URA Master Plan 2019 Subzone (EPSG:3414) boundary. We apply first-order methods (spatial and monthly Kernel Density Estimation) to reveal hotspots and their evolution, and second-order point-pattern functions (G, F, K, L) to assess clustering or dispersion across spatial scales, both overall and by SSIC band (472/474/475). The outputs are cartographic hotspot maps and concise diagnostics intended to inform urban land-use planning, centre management, and retail support policy.</p>
+</section>
 <section id="installing-the-required-r-packages" class="level1">
 <h1><strong>2 Installing the required R packages</strong></h1>
 <table class="caption-top table">
@@ -291,6 +339,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-data" class="level1">
 <h1><strong>3 The Data</strong></h1>
+<section id="point-to-the-acra-folder-and-sanity-check-the-path" class="level2">
+<h2 class="anchored" data-anchor-id="point-to-the-acra-folder-and-sanity-check-the-path">3.1 Point to the ACRA folder and sanity-check the path</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from the project root</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># if _quarto.yml is in Take_home_Ex01/</span></span>
@@ -316,6 +366,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [5] "ACRA Information on Corporate Entities ('E').csv"</code></pre>
 </div>
 </div>
+</section>
+<section id="list-all-csvs-and-preview-file-names" class="level2">
+<h2 class="anchored" data-anchor-id="list-all-csvs-and-preview-file-names">3.2 List all CSVs and preview file names</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
@@ -339,6 +392,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 [6] "ACRA Information on Corporate Entities ('F').csv"</code></pre>
 </div>
 </div>
+</section>
+<section id="stack-all-csvs-into-one-tibble" class="level2">
+<h2 class="anchored" data-anchor-id="stack-all-csvs-into-one-tibble">3.3 Stack all CSVs into one tibble</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>acra_all <span class="ot">&lt;-</span> files <span class="sc">|&gt;</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_names</span>(<span class="fu">basename</span>(files)) <span class="sc">|&gt;</span></span>
@@ -409,7 +465,9 @@ $ uen_of_audit_firm5                &lt;chr&gt; "na", "na", "na", "na", "na", "n
 $ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …</code></pre>
 </div>
 </div>
-<p>Filter out the required business entities</p>
+</section>
+<section id="filter-to-retail-ssic-472474475" class="level2">
+<h2 class="anchored" data-anchor-id="filter-to-retail-ssic-472474475">3.4 Filter to retail SSIC 472/474/475</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
@@ -483,7 +541,9 @@ $ uen_of_audit_firm5                &lt;chr&gt; "na", "na", "na", "na", "na", "n
 $ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "na", …</code></pre>
 </div>
 </div>
-<p>adding the ssic code as a seperate column</p>
+</section>
+<section id="add-a-3-digit-ssic-field-and-label-it" class="level2">
+<h2 class="anchored" data-anchor-id="add-a-3-digit-ssic-field-and-label-it">3.5 Add a 3-digit SSIC field and label it</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>business <span class="ot">&lt;-</span> business <span class="sc">%&gt;%</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ssic3 =</span> <span class="fu">substr</span>(primary_ssic_code, <span class="dv">1</span>, <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -499,7 +559,6 @@ $ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "n
 3 474   16679</code></pre>
 </div>
 </div>
-<p>Keep a label for each SSIC band:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ssic_lookup <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>ssic3, <span class="sc">~</span>ssic_label,</span>
@@ -510,7 +569,9 @@ $ name_of_audit_firm5               &lt;chr&gt; "na", "na", "na", "na", "na", "n
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>business <span class="ot">&lt;-</span> business <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(ssic_lookup, <span class="at">by =</span> <span class="st">"ssic3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Extract the business entities registered between 1st January 2024 to 30th June 2025</p>
+</section>
+<section id="time-filter-keep-entities-issued-from-2024-01-01-to-2025-06-30" class="level2">
+<h2 class="anchored" data-anchor-id="time-filter-keep-entities-issued-from-2024-01-01-to-2025-06-30">3.6 Time filter: keep entities issued from 2024-01-01 to 2025-06-30</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -635,6 +696,9 @@ $ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages 
 [55] "ssic3"                             "ssic_label"                       </code></pre>
 </div>
 </div>
+</section>
+<section id="keep-only-analysis-fields-and-standardise-datespostal" class="level2">
+<h2 class="anchored" data-anchor-id="keep-only-analysis-fields-and-standardise-datespostal">3.7 Keep only analysis fields and standardise dates/postal</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
@@ -686,7 +750,9 @@ $ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages 
 2 1550  BEDOK NORTH AVENUE 4 &lt;NA&gt;             03       24      489950     </code></pre>
 </div>
 </div>
-<p>final cleaning</p>
+</section>
+<section id="final-address-hygiene-dedupe-by-uen-and-build-a-full-geocode-string" class="level2">
+<h2 class="anchored" data-anchor-id="final-address-hygiene-dedupe-by-uen-and-build-a-full-geocode-string">3.8 Final address hygiene, dedupe by UEN, and build a full geocode string</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
@@ -740,6 +806,12 @@ $ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages 
 2 &lt;NA&gt;          08       213     570178     </code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="geocoding-base-map" class="level1">
+<h1>4 Geocoding &amp; Base Map</h1>
+<section id="define-a-onemap-postal-code-geocoder-and-run-it" class="level2">
+<h2 class="anchored" data-anchor-id="define-a-onemap-postal-code-geocoder-and-run-it">4.1 Define a OneMap postal-code geocoder and run it</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr)</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
@@ -782,25 +854,21 @@ $ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages 
 <span id="cb34-39"><a href="#cb34-39" aria-hidden="true" tabindex="-1"></a>  })</span>
 <span id="cb34-40"><a href="#cb34-40" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="join-coordinates-convert-to-sf-wgs84-svy21" class="level2">
+<h2 class="anchored" data-anchor-id="join-coordinates-convert-to-sf-wgs84-svy21">4.2 Join coordinates, convert to sf (WGS84 → SVY21)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OPTIONAL: left-pad postal codes to 6 digits if your data has things like "0718"</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># library(stringr)</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># business_ready &lt;- business_ready %&gt;%</span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(postal_code = ifelse(!is.na(postal_code),</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                               str_pad(postal_code, 6, pad = "0"),</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                               postal_code))</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>pc_lookup <span class="ot">&lt;-</span> <span class="fu">onemap_geocode_postal</span>(business_ready<span class="sc">$</span>postal_code)</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>business_geo <span class="ot">&lt;-</span> business_ready <span class="sc">%&gt;%</span></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(pc_lookup, <span class="at">by =</span> <span class="st">"postal_code"</span>)</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to sf (WGS84 -&gt; SVY21)</span></span>
-<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
-<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>business_sf <span class="ot">&lt;-</span> business_geo <span class="sc">%&gt;%</span></span>
-<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(lon), <span class="sc">!</span><span class="fu">is.na</span>(lat)) <span class="sc">%&gt;%</span></span>
-<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>pc_lookup <span class="ot">&lt;-</span> <span class="fu">onemap_geocode_postal</span>(business_ready<span class="sc">$</span>postal_code)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>business_geo <span class="ot">&lt;-</span> business_ready <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(pc_lookup, <span class="at">by =</span> <span class="st">"postal_code"</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to sf (WGS84 -&gt; SVY21)</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>business_sf <span class="ot">&lt;-</span> business_geo <span class="sc">%&gt;%</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(lon), <span class="sc">!</span><span class="fu">is.na</span>(lat)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon"</span>, <span class="st">"lat"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(business_sf), <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -812,6 +880,9 @@ $ ssic_label                        &lt;chr&gt; "Retail sale of food, beverages 
 </div>
 </div>
 </div>
+</section>
+<section id="load-ura-subzones-and-plot-a-quick-base-map" class="level2">
+<h2 class="anchored" data-anchor-id="load-ura-subzones-and-plot-a-quick-base-map">4.3 Load URA subzones and plot a quick base map</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tmap)</span>
@@ -862,6 +933,7 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </div>
+</section>
 </section>
 <section id="spatial-spatio-temporal-kernel-density-estimation-kde" class="level1">
 <h1>5. Spatial &amp; Spatio-Temporal Kernel Density Estimation (KDE)</h1>
@@ -1145,6 +1217,9 @@ Second-order functions examine <em>interaction between points</em> across distan
 </div>
 </div>
 </div>
+</section>
+<section id="discussion-planning-use" class="level1">
+<h1>7 Discussion &amp; Planning Use</h1>
 <p>The analyses give a multi-scale view of retail formation. First, KDE maps show where activity happens without being bound by administrative boundaries. This is useful for town-centre improvement, station-area planning and gaps in everyday retail. For example high 472 near dense estates shows the importance of walkable, mixed-use centres; planners can protect ground-floor frontages and human-scale streets where concentrations are sustainable. Low intensities in green belts and industrial areas reflect land-use intent rather than unmet need, avoiding false signals.</p>
 <p>Second, type-specific KDEs show different retail categories go to different urban morphologies: daily-necessity (472) clusters in neighbourhood hubs; ICT (474) anchors in regional malls/transport nodes; household goods (475) follow larger floorplate corridors. This can inform tenant mix, zoning flexibility and logistics/parking provisions. For example ICT and household goods may benefit from transit adjacency and consolidated loading, while 472 needs fine-grain street networks and pedestrian priority.</p>
 <p>Third, second-order stats (G/F/K/L) show short-range clustering is robust and consistent with agglomeration economies (shared footfall, complementary offers, brand variety). Recognising these natural scales helps calibrate allowable frontage lengths, plot amalgamation rules and capex for place-making (e.g.&nbsp;shaded arcades, seating, micro-squares) that support cluster health. Policymakers can encourage temporal spread (e.g.&nbsp;evening economy) to maximise centre vitality without over-concentration.</p>

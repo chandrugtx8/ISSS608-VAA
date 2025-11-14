@@ -2,6 +2,7 @@
 title: "In-class Exercise 6"
 author: "chandru"
 ---
+
 ##Loading the required the packages
 
 ```{r}
@@ -34,11 +35,10 @@ extract_kml_field <- function(html_text, field_name) {
 }
 ```
 
-
-
 ```{r}
 mpsz
 ```
+
 0-D Bus Trips
 
 ```{r}
@@ -46,6 +46,7 @@ mpsz
 odbus <- read_csv("../In-class_Ex06/data/aspatial/origin_destination_bus_202508.csv")
 
 ```
+
 ```{r}
 
 BusStop <- st_read(dsn = "../In-class_Ex06/data/geospatial/BusStopLocation_Aug2025",layer = "BusStop")
@@ -64,10 +65,10 @@ mpsz<- st_transform(mpsz, crs =3414)
 mpsz
 ```
 
-
 ```{r}
 tm_shape(mpsz) + tm_polygons() + tm_shape(BusStop) + tm_dots()
 ```
+
 ##Extracting Bus Stops within Singapore
 
 ```{r}
@@ -86,11 +87,6 @@ tm_shape(mpsz) + tm_polygons() + tm_shape(BusStop_in_SG) + tm_dots()
 hexagon <- st_make_grid(mpsz, cellsize=700, what='polygon', square= FALSE) %>% st_sf()
 ```
 
-
-
-
-
-
 ##Filtering hexagons with bus stops
 
 ```{r}
@@ -99,7 +95,6 @@ hexagon$n_collisions= lengths(st_intersects(hexagon,BusStop_in_SG))
 
 hexagon <- filter(hexagon, n_collisions >0)
 ```
-
 
 ##Assigning ids to each Hexagon
 
@@ -110,6 +105,7 @@ hexagon$HEX_ID <- sprintf("H%04d", seq_len(nrow(hexagon))) %>% as.factor()
 
 kable(head(hexagon))
 ```
+
 ##Preparing Trip Generation Data
 
 ```{r}
@@ -140,4 +136,3 @@ kable(head(bs_hex))
 trips <- inner_join(trips, bs_hex)
 kable(head(trips))
 ```
-

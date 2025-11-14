@@ -14,7 +14,7 @@ This study analyses new entities from Jan 2024 to Jun 2025 filtered from ACRA an
 # **2 Installing the required R packages**
 
 | Package | Description |
-|------------------------------------|------------------------------------|
+|----|----|
 | [**sf**](https://r-spatial.github.io/sf/) | Provides functions to manage, processing, and manipulate **Simple Features**, a formal geospatial data standard that specifies a storage and access model of spatial geometries such as points, lines, and polygons. |
 | [**spNetwork**](https://cran.r-project.org/web/packages/spNetwork/) | Provides functions to perform Spatial Point Patterns Analysis such as kernel density estimation (KDE) and K-function on network. It also can be used to build spatial matrices (‘listw’ objects like in ‘spdep’ package) to conduct any kind of traditional spatial analysis with spatial weights based on reticular distances. |
 | [**spatstat**](https://spatstat.org/) | Provides functions for spatial statistics with a strong focus on analysing spatial point patterns. |
