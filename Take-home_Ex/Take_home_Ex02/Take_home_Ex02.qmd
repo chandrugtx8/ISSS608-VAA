@@ -113,13 +113,6 @@ od <- od %>%
 
 ```
 
-
-
-
-
-
-
-
 ```{r}
 
 names(bus_stops)  # should include "stop_code"
@@ -147,8 +140,6 @@ nrow(od_pts)
 head(st_drop_geometry(od_pts))
 
 ```
-
-
 
 ```{r}
 library(dplyr)
@@ -195,7 +186,6 @@ hex <- hex |>
 
 ```
 
-
 ```{r}
 library(tmap)
 tmap_mode("plot")
@@ -226,13 +216,9 @@ tm_layout(frame = FALSE)
 
 ```
 
+# 5) LMSA (Local Moran’s I, Local Geary’s C, Getis-Ord Gi\*)
 
-
-
-# 5) LMSA (Local Moran’s I, Local Geary’s C, Getis-Ord Gi*)
-
-Built queen-contiguity neighbours on the hex TAZ and row-standardised spatial weights. For each window (AM, PM, Weekend), computed three local statistics: (i) Local Moran’s I to identify hot/cold clusters and spatial outliers, (ii) Local Geary’s C to flag local dissimilarity, and (iii) Getis-Ord Gi* to locate high/low concentration without relying on global mean/variance. Results retain each statistic, a two-sided p-value (permutation for Moran/Geary; z-based for Gi*), and a significance mask (p < 0.05). For Moran, also derived HH/LL/HL/LH quadrant labels (mean-centered) for quick mapping.
-
+Built queen-contiguity neighbours on the hex TAZ and row-standardised spatial weights. For each window (AM, PM, Weekend), computed three local statistics: (i) Local Moran’s I to identify hot/cold clusters and spatial outliers, (ii) Local Geary’s C to flag local dissimilarity, and (iii) Getis-Ord Gi\* to locate high/low concentration without relying on global mean/variance. Results retain each statistic, a two-sided p-value (permutation for Moran/Geary; z-based for Gi\*), and a significance mask (p \< 0.05). For Moran, also derived HH/LL/HL/LH quadrant labels (mean-centered) for quick mapping.
 
 ```{r}
 
@@ -331,7 +317,6 @@ sig_summary
 
 ```
 
-
 ```{r}
 # --- 5.x Visualise LMSA results (Gi* and Moran quadrants) ---
 
@@ -401,9 +386,6 @@ tm_layout(frame = FALSE)
 
 ```
 
-
-
-
 ```{r}
 
 
@@ -421,7 +403,7 @@ tm_shape(hex_lmsa) +
 
 # 6)Emerging Hot Spot Analysis (EHSA) on Monthly Gi
 
-Built a monthly space–time view of trip intensity by aggregating origin tap-ons per hexagon for each policy window (AM, PM, weekend/holiday). For every month we computed local Getis–Ord Gi* to obtain a z-score surface of hot/cold clustering. For each hex we then applied a Mann–Kendall trend test across the monthly Gi* sequence and assigned an EHSA label: “new”, “intensifying”, “persistent”, “diminishing”, or “sporadic” hot/cold, otherwise “no pattern.” The result identifies where demand clusters are strengthening, weakening, or newly emerging, giving operators a time-aware basis for targeted service adjustments and monitoring.
+Built a monthly space–time view of trip intensity by aggregating origin tap-ons per hexagon for each policy window (AM, PM, weekend/holiday). For every month we computed local Getis–Ord Gi\* to obtain a z-score surface of hot/cold clustering. For each hex we then applied a Mann–Kendall trend test across the monthly Gi\* sequence and assigned an EHSA label: “new”, “intensifying”, “persistent”, “diminishing”, or “sporadic” hot/cold, otherwise “no pattern.” The result identifies where demand clusters are strengthening, weakening, or newly emerging, giving operators a time-aware basis for targeted service adjustments and monitoring.
 
 ```{r}
 # --- 6) EHSA-style trend on monthly Gi* ------------------------------
@@ -537,12 +519,3 @@ ehsa_we <- label_each_hex(we_gi, we_month_cols)
 
 
 ```
-
-
-
-
-
-
-
-
-
