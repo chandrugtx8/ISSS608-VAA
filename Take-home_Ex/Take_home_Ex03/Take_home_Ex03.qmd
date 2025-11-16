@@ -1,0 +1,390 @@
+---
+title: "Take_home_Ex03"
+author: "Chandru"
+---
+
+# 1 Overview
+
+Housing resale prices in Singapore are shaped by both the structural attributes of individual flats and the locational context of their neighbourhoods. Traditional global regression often assumes that these relationships are constant across space, but HDB estates are highly heterogeneous: accessibility, amenities and ageing patterns differ across towns and even between nearby blocks.
+
+In this exercise, I focus on \[3/4/5\]-room HDB resale flats and \[Option 1: explaining drivers / Option 2: predicting prices\] over the period \[state period according to option\]. I build a reproducible geospatial workflow that:
+
+-   converts aspatial HDB resale records into geographically referenced data;
+-   derives structural and locational predictors (e.g. floor level, remaining lease, distance to MRT, density of childcare centres);
+-   calibrates both a *global* price model and a *geographically weighted* model; and
+-   compares how model performance and coefficients vary across space to support location-sensitive housing insights.
+
+# 2 **Installing and Loading R packages**
+
+his code chunk performs 3 tasks:
+
+-   A list called packages will be created and will consists of all the R packages required to accomplish this exercise.
+
+-   Check if R packages on package have been installed in R and if not, they will be installed.
+
+-   After all the R packages have been installed, they will be loaded.
+
+```{r}
+
+pacman::p_load(
+  sf, spdep, GWmodel, SpatialML,
+  tmap, rsample, Metrics, tidyverse,
+  readr, stringr, lwgeom, lubridate   # <-- add lubridate here
+)
+```
+
+# 3 **Loading Data**
+
+We first read the HDB resale CSV from your Data folder, check its structure, and then keep only 3/4/5-room flats with valid coordinates. We also convert the data into an sf object in SVY21 (EPSG:3414).
+
+```{r}
+
+# ---- 3.1 Read raw resale data ------------------------------------------
+
+# adjust the path if needed
+resale_raw <- readr::read_csv(
+  "Data/ResaleflatpricesbasedonregistrationdatefromJan2017onwards.csv"
+)
+
+dplyr::glimpse(resale_raw)
+```
+
+```{r}
+# ---- 3.2 Aggregate resale data by town -----------------------------------
+
+
+resale_town <- resale_raw %>%
+  dplyr::mutate(
+    # 1) compute resale year from "month" (YYYY-MM)
+    resale_year         = lubridate::year(lubridate::ymd(paste0(month, "-01"))),
+    # 2) lease start year
+    lease_commence_year = as.numeric(lease_commence_date),
+    # 3) remaining lease (assume 99-year HDB lease)
+    remaining_lease_yrs = pmax(0, 99 - (resale_year - lease_commence_year)),
+    # 4) price per sqm
+    price_psm           = resale_price / floor_area_sqm
+  ) %>%
+  dplyr::group_by(town) %>%
+  dplyr::summarise(
+    n_flats            = dplyr::n(),
+    mean_price_psm     = mean(price_psm, na.rm = TRUE),
+    mean_floor_area    = mean(floor_area_sqm, na.rm = TRUE),
+    mean_remaining_yrs = mean(remaining_lease_yrs, na.rm = TRUE)
+  )
+
+dplyr::glimpse(resale_town)
+
+
+```
+
+### 3.3 Attach planning-area polygons and build `resale_sf`
+
+We read the URA Master Plan 2019 subzone KML, extract the planning-area name (`PLN_AREA_N`) from the `Description` field, aggregate subzones to planning-area polygons, and join them to the town summary. The result is `resale_sf`: one polygon per town with the resale statistics attached.
+
+```{r}
+
+
+
+
+
+# ---- 3.3 Attach URA MP19 planning-area polygons to town stats ----------
+
+# 1) Read URA MP19 KML
+mpsz <- sf::st_read(
+  "Data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"
+)
+
+# 2) Extract planning-area name from Description (PLN_AREA_N='ANG MO KIO')
+mpsz <- mpsz %>%
+  dplyr::mutate(
+    PLN_AREA_N = stringr::str_match(Description, "PLN_AREA_N='([^']+)'")[, 2]
+  )
+
+# 3) Fix invalid geometries
+mpsz_valid <- sf::st_make_valid(mpsz)
+
+# 4) Build a fuzzy name lookup: match each HDB town to a PLN_AREA_N --------
+mpsz_names <- unique(mpsz_valid$PLN_AREA_N)
+
+name_lookup <- tibble::tibble(town = sort(unique(resale_town$town))) %>%
+  dplyr::mutate(
+    pln_area = purrr::map_chr(town, \(t) {
+      # find all planning areas whose name contains the town string
+      cand <- mpsz_names[grepl(toupper(t), toupper(mpsz_names))]
+      if (length(cand) == 0) NA_character_ else cand[1]   # take first match
+    })
+  )
+
+name_lookup   # you can inspect this to see the mapping
+
+# 5) Join polygons -> lookup -> town stats ---------------------------------
+resale_sf <- mpsz_valid %>%
+  dplyr::inner_join(name_lookup, by = c("PLN_AREA_N" = "pln_area")) %>%
+  dplyr::left_join(resale_town, by = "town") %>%
+  dplyr::filter(!is.na(mean_price_psm))
+
+# Quick checks
+table(is.na(resale_sf$mean_price_psm))
+dplyr::glimpse(resale_sf)
+nrow(resale_sf)
+
+
+
+```
+
+# 4 **Prepare modelling data & quick map**
+
+```{r}
+
+# We already have resale_town from section 3.2
+
+# Sort towns by mean price
+resale_town_plot <- resale_town %>%
+  dplyr::filter(!is.na(mean_price_psm)) %>%
+  dplyr::arrange(desc(mean_price_psm))
+
+dplyr::glimpse(resale_town_plot)
+
+# Bar chart: mean price per sqm by town
+library(ggplot2)
+
+ggplot(resale_town_plot,
+       aes(x = reorder(town, mean_price_psm),
+           y = mean_price_psm)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    x = "Town",
+    y = "Mean resale price (S$/sqm)",
+    title = "Comparison of mean resale price per sqm across towns"
+  )
+
+
+
+```
+
+# 5 **Model Building**
+```{r}
+# ---- 5A Prepare modelling data ----
+
+resale_model <- resale_town %>% 
+  dplyr::mutate(
+    log_price_psm = log(mean_price_psm)
+  ) %>% 
+  dplyr::select(
+    town,
+    log_price_psm,
+    mean_floor_area,
+    mean_remaining_yrs,
+    n_flats
+  )
+
+dplyr::glimpse(resale_model)
+```
+
+```{r}
+# ---- 5B Global OLS model ----
+
+model_ols <- lm(
+  log_price_psm ~ mean_floor_area + mean_remaining_yrs + n_flats,
+  data = resale_model
+)
+
+summary(model_ols)
+
+```
+
+Interpretation of the Global OLS Model
+
+The global OLS model explains about 55% (R² = 0.553) of the variation in log resale price per sqm, indicating a moderately good fit for aggregated town-level data. Among the predictors, mean floor area has a significant negative effect on resale price per sqm (β = −0.00818, p \< 0.01). This suggests that towns with generally larger flats tend to have lower price per sqm, which is consistent with housing economics where larger units typically command lower cost per unit area.
+
+The number of resale transactions (n_flats) is also a significant negative predictor (β = −1.88e−05, p \< 0.01), implying that towns with higher resale activity tend to exhibit slightly lower prices, potentially reflecting more mature/older estates or markets with greater supply.
+
+In contrast, mean remaining lease years is not statistically significant (p = 0.544). This indicates that when averaged at the town level, lease decay does not show a strong global relationship with price per sqm—supporting the need for local models like GWR to capture spatial variation in lease effects across different towns.
+
+Overall, the significance of only two predictors and the moderate R² suggests that important spatial heterogeneity likely exists, motivating the use of geographically weighted regression (GWR) in the next section.
+
+```{r}
+# ---- 5C.1 Add response for GWR into resale_sf ---------------------------
+
+resale_sf <- resale_sf %>%
+  dplyr::mutate(
+    log_price_psm = log(mean_price_psm)
+  )
+
+dplyr::glimpse(resale_sf)
+
+```
+
+```{r}
+# ---- 5C.2 Choose GWR bandwidth (cross-validation) ----------------------
+
+# sf -> sp (already ok)
+resale_sp <- as(resale_sf, "Spatial")
+
+gwr_formula <- log_price_psm ~ mean_floor_area + mean_remaining_yrs + n_flats
+
+bw_gwr <- GWmodel::bw.gwr(
+  formula  = gwr_formula,
+  data     = resale_sp,
+  adaptive = TRUE
+)
+
+bw_gwr   # quick check
+   # quick check of chosen bandwidth
+```
+
+```{r}
+# ---- 5C.3 Fit GWR and attach outputs to resale_sf ----------------------
+
+gwr_fit <- GWmodel::gwr.basic(
+  formula  = gwr_formula,
+  data     = resale_sp,
+  bw       = bw_gwr,
+  adaptive = TRUE
+)
+
+gwr_df <- as.data.frame(gwr_fit$SDF)
+
+# --- handle possible naming differences for local R2 --------------------
+if ("localR2" %in% names(gwr_df)) {
+  # do nothing, already good
+} else if ("Local_R2" %in% names(gwr_df)) {
+  names(gwr_df)[names(gwr_df) == "Local_R2"] <- "localR2"
+} else {
+  stop("Could not find local R2 column in gwr_df. Check names(gwr_df).")
+}
+
+# Now build the combined sf with GWR outputs
+resale_sf_gwr_out <- dplyr::bind_cols(
+  resale_sf,
+  gwr_df %>%
+    dplyr::transmute(
+      localR2,
+      coef_mean_floor_area    = mean_floor_area,
+      coef_mean_remaining_yrs = mean_remaining_yrs,
+      coef_n_flats            = n_flats
+    )
+)
+
+dplyr::glimpse(resale_sf_gwr_out)
+
+
+```
+
+```{r}
+
+# 5D.1 Map of local R2 ----------------------------------------------------
+
+tmap_mode("plot")
+
+tm_shape(resale_sf_gwr_out) +
+  tm_polygons(
+    col   = "localR2",
+    style = "quantile",
+    title = "Local R-squared"
+  ) +
+  tm_layout(legend.outside = TRUE)
+
+```
+
+### 5D.2 Maps of key GWR coefficients
+
+Now we map how the **effects of floor area**, **remaining lease**, and **number of flats** vary by location.\
+Positive values mean the variable *increases* log price there; negative values mean it *decreases* log price.
+
+```{r}
+
+
+
+
+# 5D.2 Coefficient surfaces from GWR -------------------------------------
+
+# (a) Effect of floor area
+tm_shape(resale_sf_gwr_out) +
+  tm_polygons(
+    col   = "coef_mean_floor_area",
+    style = "quantile",
+    title = "GWR coef: mean floor area"
+  ) +
+  tm_layout(legend.outside = TRUE)
+
+# (b) Effect of remaining lease
+tm_shape(resale_sf_gwr_out) +
+  tm_polygons(
+    col   = "coef_mean_remaining_yrs",
+    style = "quantile",
+    title = "GWR coef: remaining lease (yrs)"
+  ) +
+  tm_layout(legend.outside = TRUE)
+
+# (c) Effect of n_flats
+tm_shape(resale_sf_gwr_out) +
+  tm_polygons(
+    col   = "coef_n_flats",
+    style = "quantile",
+    title = "GWR coef: number of flats"
+  ) +
+  tm_layout(legend.outside = TRUE)
+
+```
+
+#**6. Interpretation of Global OLS model**
+
+### Global OLS Findings
+
+-   The global model explains about 55% of the variation in log resale price per sqm (Adj. R² ≈ 0.49), which is moderate.
+
+-    Floor area has a *negative* coefficient (approx −0.008), meaning larger flats tend to have lower price per sqm.
+
+-   Remaining lease years is *not statistically significant* (p ≈ 0.54). Lease duration varies little at the planning area level, reducing explanatory power
+
+-    Number of flats sold is also negative and statistically significant. This suggests that areas with more resale transactions tend to have slightly lower unit prices, possibly reflecting higher supply or more mature estates.
+
+### **Conclusion for Step 6A**
+
+The OLS model gives a reasonable but incomplete explanation — suggesting relationships may vary across space, motivating GWR.
+
+## **6B. Interpretation of GWR results**
+
+Here is the interpretation text:
+
+### **Local R² Interpretation**
+
+-    Local R² varies across the island (0.40–0.75 range).
+
+-    The model fits **best in mature central areas** such as\
+    **Queenstown, Bukit Merah, Kallang/Whampoa, Bishan** — where price determinants are more consistent.
+
+-    The model fits **least well in fringe/suburban areas** such as **Woodlands, Sembawang, Punggol**, implying price drivers differ in these towns (e.g., amenities, new developments not captured in the data).
+
+### **Coefficient: Floor area**
+
+-    The effect is **universally negative**, but **stronger in central regions**.
+
+-    Interpretation: In central estates, smaller flats command a **much higher premium per sqm**, so adding floor area reduces price efficiency.
+
+-    In suburban towns, the effect is weaker; price per sqm is more uniform regardless of size.
+
+### **Coefficient: Remaining lease**
+
+-    Small positive coefficients around the island, but stronger in **older estates** like\
+    **Bedok, Ang Mo Kio, Toa Payoh**.
+
+-   Interpretation:\
+    Buyers pay a premium for extra lease years in old estates, but this effect is small and uneven
+
+### **Coefficient: Number of flats**
+
+-    Mostly negative across Singapore.
+
+-    Stronger negative effects in **Queenstown, Bukit Merah, Clementi**, where high sales volume corresponds to lower \$/sqm.
+
+-    Interpretation:\
+    Higher resale activity may reflect older or less premium stock → reducing price per sqm.
+
+# **6C. Final Summary** 
+
+### **Summary**
+
+The global OLS model provides a moderate fit (Adj. R² ≈ 0.49) and identifies significant negative relationships between unit price and both floor area and resale volume. However, the model assumes spatial stationarity, which is unrealistic for a heterogeneous housing market. GWR removes this assumption and reveals strong spatial variation in both model fit and coefficients. Local R² is highest in mature central estates, indicating more stable price determinants, and lowest in newer suburban areas. Floor area has a consistently negative effect on price per sqm, but its magnitude varies substantially across space, with the strongest influence in central towns. The effect of remaining lease is small but stronger in older estates, while the impact of transaction volume is more negative in high-activity markets. Overall, GWR provides a richer, location-sensitive understanding of Singapore’s resale price dynamics.
